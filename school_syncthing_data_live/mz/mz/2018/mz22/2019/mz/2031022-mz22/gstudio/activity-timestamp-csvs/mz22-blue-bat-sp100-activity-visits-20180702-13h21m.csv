@@ -1,0 +1,13 @@
+Unit,Lesson,Activity,Language,VisitedOn,OutTime,OutAction,TimeSpentInSeconds,Buddies
+atom-in-chemistry,lesson-1-why-chemistry,11-why-chemistry,en,2018-06-05 12:39:48.808000,NA,NA,NA,NA
+atom-in-chemistry,pre-test,pre-test,en,2018-06-05 12:37:46.594000,2018-06-05 12:39:48.808000,activity_player_detail,122.214,NA
+pre-clix-survey,student-survey,6-my-understanding-of-a-subject-depends-on-how-i-choose-to-study-it,en,2018-06-05 12:33:57.075000,NA,NA,NA,[u'yellow-bear-sp100']
+pre-clix-survey,student-survey,5-please-enter-your-student-login-id,en,2018-06-05 12:33:48.277000,2018-06-05 12:33:57.075000,activity_player_detail,8.798,[u'yellow-bear-sp100']
+pre-clix-survey,student-survey,5-please-enter-your-student-login-id,en,2018-06-05 12:33:16.839000,2018-06-05 12:33:48.277000,activity_player_detail,31.438,[u'yellow-bear-sp100']
+pre-clix-survey,student-survey,4-district,en,2018-06-05 12:32:38.759000,2018-06-05 12:33:16.839000,activity_player_detail,38.08,[u'yellow-bear-sp100']
+pre-clix-survey,student-survey,3-state,en,2018-06-05 12:32:11.823000,2018-06-05 12:32:38.759000,activity_player_detail,26.936,[u'yellow-bear-sp100']
+pre-clix-survey,student-survey,4-district,en,2018-06-05 12:31:23.208000,2018-06-05 12:32:11.823000,activity_player_detail,48.615,[u'yellow-bear-sp100']
+pre-clix-survey,student-survey,3-state,en,2018-06-05 12:31:04.713000,2018-06-05 12:31:23.208000,activity_player_detail,18.495,[u'yellow-bear-sp100']
+pre-clix-survey,student-survey,2-grade,en,2018-06-05 12:30:48.279000,2018-06-05 12:31:04.713000,activity_player_detail,16.434,[u'yellow-bear-sp100']
+pre-clix-survey,student-survey,2-grade,en,2018-06-05 12:30:44.489000,2018-06-05 12:30:48.279000,activity_player_detail,3.79,[u'yellow-bear-sp100']
+pre-clix-survey,student-survey,1-gender,en,2018-06-05 12:30:25.822000,2018-06-05 12:30:44.489000,activity_player_detail,18.667,[u'yellow-bear-sp100']

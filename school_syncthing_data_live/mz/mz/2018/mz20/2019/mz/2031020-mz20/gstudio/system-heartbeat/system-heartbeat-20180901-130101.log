@@ -1,0 +1,152 @@
+Info-msg : Checking directory existence. 
+
+/data/system-heartbeat/ directory exists
+Info-msg : hostname of server (hostname). 
+
+clixserver.tiss.edu
+ 
+
+------------------------------------------------------------------------------------ 
+
+
+Info-msg : internal ip addresses of the system (ip address). 
+
+ 
+
+------------------------------------------------------------------------------------ 
+
+
+Info-msg : external ip addresses of the system (public ip address). 
+
+
+ 
+
+------------------------------------------------------------------------------------ 
+
+
+Info-msg : RAM details (free -h). 
+
+             total       used       free     shared    buffers     cached
+Mem:          7.7G       5.8G       1.9G       227M       741M       2.5G
+-/+ buffers/cache:       2.5G       5.2G
+Swap:         7.6G         0B       7.6G
+ 
+
+------------------------------------------------------------------------------------ 
+
+
+Info-msg : HDD details (df -h). 
+
+Filesystem      Size  Used Avail Use% Mounted on
+overlay         908G   61G  801G   8% /
+tmpfs            64M     0   64M   0% /dev
+tmpfs           3.9G     0  3.9G   0% /sys/fs/cgroup
+/dev/sda3       908G   61G  801G   8% /data
+shm              64M     0   64M   0% /dev/shm
+tmpfs           3.9G     0  3.9G   0% /proc/scsi
+tmpfs           3.9G     0  3.9G   0% /sys/firmware
+ 
+
+------------------------------------------------------------------------------------ 
+
+
+Info-msg : Size description in '/data/'. 
+
+8.0K	/data/2031020-mz20-activity-timestamp-csvs.tar.gz
+51M	/data/2031020-mz20-assessment-media.tar.gz
+4.0K	/data/2031020-mz20-gstudio_tools_logs.tar.gz
+64K	/data/activity-timestamp-csvs
+132M	/data/assessment-media
+16K	/data/clixserver.tiss.edu
+398M	/data/db
+4.0K	/data/drop_database.sql
+12K	/data/git-commit-details.log
+9.6M	/data/gstudio-exported-users-analytics-csvs
+96K	/data/gstudio-logs
+8.0K	/data/local_settings.py
+17G	/data/media
+5.9G	/data/nginx-logs
+504K	/data/pg_dump_all.sql
+2.7M	/data/postgres-dump
+3.4M	/data/qbank
+673M	/data/rcs-repo
+4.0K	/data/server_settings.py
+648K	/data/system-heartbeat
+ 
+
+------------------------------------------------------------------------------------ 
+
+
+Info-msg : No of directories and files in '/data/media/'. 
+
+No of directories : 4002 
+
+No of files       : 9629 
+
+ 
+
+------------------------------------------------------------------------------------ 
+
+
+Info-msg : uptime (uptime). 
+
+ 13:01:02 up 21:04,  0 users,  load average: 0.13, 0.09, 0.10
+ 
+
+------------------------------------------------------------------------------------ 
+
+
+Info-msg : current process (uptime). 
+
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.0  0.0   4456   752 ?        Ss   Aug31   0:00 /bin/sh -c /home/docker/code/scripts/initialize.sh  | sed -e "s/^/$(date +%Y%m%d-%H%M%S) :  /"  2>&1 | tee -a ${LOG_INSTALL_DOCKER}
+root        10  0.0  0.0  18000  2848 ?        S    Aug31   0:00 /bin/bash /home/docker/code/scripts/initialize.sh
+root        11  0.0  0.0  10996  1404 ?        S    Aug31   0:00 sed -e s/^/20180831-155729 :  /
+root        13  0.0  0.0   4360  1264 ?        S    Aug31   0:00 tee -a /root/DockerLogs/$(DATE_LOG)-gsd-install.log
+root        19 22.3  5.4 693144 444468 ?       Sl   Aug31 282:42 mongod --config /home/docker/code/confs/mongod.conf
+root        21  0.0  0.0  23664  2152 ?        Ss   Aug31   0:00 /usr/sbin/cron
+postgres    40  0.0  0.2 244856 19180 ?        S    Aug31   0:02 /usr/lib/postgresql/9.3/bin/postgres -D /var/lib/postgresql/9.3/main -c config_file=/etc/postgresql/9.3/main/postgresql.conf
+postgres    73  0.0  0.0 244992  5284 ?        Ss   Aug31   0:00 postgres: checkpointer process                                                                                              
+postgres    74  0.0  0.0 244856  4556 ?        Ss   Aug31   0:00 postgres: writer process                                                                                                    
+postgres    75  0.0  0.0 244856  3268 ?        Ss   Aug31   0:00 postgres: wal writer process                                                                                                
+postgres    76  0.0  0.0 245732  5996 ?        Ss   Aug31   0:02 postgres: autovacuum launcher process                                                                                       
+postgres    77  0.0  0.0 100820  3640 ?        Ss   Aug31   0:06 postgres: stats collector process                                                                                           
+root       180  0.0  0.0  25356  2956 ?        Ss   Aug31   0:00 /usr/lib/postfix/master
+postfix    186  0.0  0.0  27468  2828 ?        S    Aug31   0:00 qmgr -l -t unix -u
+root       194  0.0  0.0  61388  3124 ?        Ss   Aug31   0:00 /usr/sbin/sshd
+memcache   201  0.0  0.1 336600 14108 ?        Sl   Aug31   0:04 /usr/bin/memcached -m 64 -p 11211 -u memcache -l 127.0.0.1
+rabbitmq   230  0.0  0.0   7512    88 ?        S    Aug31   0:00 /usr/lib/erlang/erts-5.10.4/bin/epmd -daemon
+rabbitmq   254  0.0  0.0   4456   780 ?        S    Aug31   0:00 /bin/sh /usr/sbin/rabbitmq-server
+rabbitmq   299  0.4  1.1 2303112 92880 ?       Sl   Aug31   6:18 /usr/lib/erlang/erts-5.10.4/bin/beam.smp -W w -K true -A30 -P 1048576 -- -root /usr/lib/erlang -progname erl -- -home /var/lib/rabbitmq -- -pa /usr/lib/rabbitmq/lib/rabbitmq_server-3.2.4/sbin/../ebin -noshell -noinput -s rabbit boot -sname rabbit@clixserver -boot start_sasl -kernel inet_default_connect_options [{nodelay,true}] -sasl errlog_type error -sasl sasl_error_logger false -rabbit error_logger {file,"/var/log/rabbitmq/rabbit@clixserver.log"} -rabbit sasl_error_logger {file,"/var/log/rabbitmq/rabbit@clixserver-sasl.log"} -rabbit enabled_plugins_file "/etc/rabbitmq/enabled_plugins" -rabbit plugins_dir "/usr/lib/rabbitmq/lib/rabbitmq_server-3.2.4/sbin/../plugins" -rabbit plugins_expand_dir "/var/lib/rabbitmq/mnesia/rabbit@clixserver-plugins-expand" -os_mon start_cpu_sup false -os_mon start_disksup false -os_mon start_memsup false -mnesia dir "/var/lib/rabbitmq/mnesia/rabbit@clixserver"
+root       336  0.0  0.6 186400 50140 ?        S    Aug31   0:00 python manage.py celeryd -f /var/log/celeryd.log -l INFO
+rabbitmq   397  0.0  0.0   7476   880 ?        Ss   Aug31   0:00 inet_gethost 4
+rabbitmq   398  0.0  0.0   9568  1588 ?        S    Aug31   0:00 inet_gethost 4
+root       410  0.0  0.5 185776 42504 ?        S    Aug31   0:00 python manage.py celeryd -f /var/log/celeryd.log -l INFO
+root       411  0.0  0.5 185776 42508 ?        S    Aug31   0:00 python manage.py celeryd -f /var/log/celeryd.log -l INFO
+root       412  0.0  0.5 185776 42512 ?        S    Aug31   0:00 python manage.py celeryd -f /var/log/celeryd.log -l INFO
+root       413  0.0  0.5 185776 42520 ?        S    Aug31   0:00 python manage.py celeryd -f /var/log/celeryd.log -l INFO
+root       437  0.0  0.1  33152  9920 ?        S    Aug31   0:00 python -m smtpd -n -c DebuggingServer localhost:1025
+root       440  0.0  1.1 881412 91024 ?        Sl   Aug31   0:28 python main.py
+root       446  0.0  0.2  52492 17064 ?        S    Aug31   0:16 /usr/bin/python /usr/bin/supervisord -n
+root       461  0.0  0.0  32536  6488 ?        S    Aug31   0:00 nginx: master process /usr/sbin/nginx
+root       462  0.0  0.2  63412 20612 ?        S    Aug31   0:03 /usr/local/bin/uwsgi --ini /home/docker/code/confs/uwsgi.ini
+www-data   463  0.0  0.0  33404  6580 ?        S    Aug31   0:03 nginx: worker process
+www-data   464  0.0  0.0  33224  6684 ?        S    Aug31   0:00 nginx: worker process
+www-data   465  0.0  0.0  33236  6660 ?        S    Aug31   0:00 nginx: worker process
+www-data   466  0.0  0.0  33404  6760 ?        S    Aug31   0:10 nginx: worker process
+root       467  0.0  1.3 284268 105700 ?       S    Aug31   0:08 /usr/local/bin/uwsgi --ini /home/docker/code/confs/uwsgi.ini
+root       468  0.0  1.3 287220 108620 ?       S    Aug31   0:10 /usr/local/bin/uwsgi --ini /home/docker/code/confs/uwsgi.ini
+root       469  0.0  1.3 284276 105584 ?       S    Aug31   0:13 /usr/local/bin/uwsgi --ini /home/docker/code/confs/uwsgi.ini
+root       470  0.0  1.3 287236 108636 ?       S    Aug31   0:26 /usr/local/bin/uwsgi --ini /home/docker/code/confs/uwsgi.ini
+postfix   1801  0.0  0.0  27420  2796 ?        S    12:56   0:00 pickup -l -t unix -u -c
+root      1873  0.0  0.0  59648  2980 ?        S    13:01   0:00 /USR/SBIN/CRON
+root      1874  0.0  0.0   4456   768 ?        Ss   13:01   0:00 /bin/sh -c /home/docker/code/scripts/system-heartbeat.sh  > /tmp/cron-system-heartbeat.log
+root      1875  0.0  0.0   9588  2368 ?        S    13:01   0:00 /bin/bash /home/docker/code/scripts/system-heartbeat.sh
+root      1876  0.0  0.0   9600  2540 ?        S    13:01   0:00 /bin/bash /home/docker/code/scripts/system-heartbeat.sh
+root      1877  0.0  0.0   4360   644 ?        S    13:01   0:00 tee /data/system-heartbeat/system-heartbeat-20180901-130101.log
+root      1898  0.0  0.0  15580  2032 ?        R    13:01   0:00 ps aux
+ 
+
+------------------------------------------------------------------------------------ 
+
+
