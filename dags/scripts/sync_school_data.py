@@ -18,6 +18,43 @@ def schools_updated(rsync_log):
     schools = set([each[0] for each in pattern.findall(log_text) if each[1] == 'gstudio'])
     return list(schools)
 
+def rsync_data_local(state, src, dst, **context):
+    '''
+    Function to sync state data from local hdd.
+    '''
+
+    user = clix_config.remote_user
+    ip = clix_config.remote_ip
+    passwd = clix_config.remote_passwd
+
+    def local_sync(src, dst):
+        cmd = "rsync -avzhP --stats {2} {3}".format(src, dst)
+        #cmd = "rsync -avzhP --stats {0} {1}".format(src, dst)
+        rsync = pexpect.spawn(cmd, timeout=3600)
+
+        try:
+            i = rsync.expect()
+        except pexpect.EOF:
+            print("EOF Exception for Syncing")
+            raise Exception('Rysnc didnt work!')
+
+        except pexpect.TIMEOUT:
+            print("TIMEOUT Exception Syncing")
+            raise Exception('Not enough time given to Rsync!')
+
+        else:
+          rsync_log = rsync.read()
+          list_of_schools_updated = schools_updated(rsync_log)
+
+          context['ti'].xcom_push(key='school_update_list', value=list_of_schools_updated)
+          Variable.set('school_update_list', list_of_schools_updated)
+          #if list_of_schools_updated:
+        #     Variable.set('prev_update_date', Variable.get('curr_update_date'))
+        #     Variable.set('curr_update_date', datetime.utcnow())
+          rsync.close()
+
+    return local_sync(src, dst)
+
 def rsync_data_ssh(state, src, dst, **context):
     '''
     Function to sync state data through ssh.

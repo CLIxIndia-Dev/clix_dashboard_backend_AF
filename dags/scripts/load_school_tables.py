@@ -2,7 +2,7 @@
 # for a set of schools whose data has been updated through syncthing_data
 from math import ceil
 
-from scripts.clix_platform_data_processing.get_metrics import get_num_stud_daily
+from scripts.clix_platform_data_processing.get_metrics import metrics_data
 from scripts.clix_platform_data_processing.load_tables import load_into_db
 
 #import scripts.clix_platform_data_processing.get_metrics.get_modulevisits
@@ -28,16 +28,28 @@ def process_school_tables(state, chunk, **context):
     Function to process tables for a set of schools whose
     data has been updated through syncthing
     '''
-    #list_of_schools = context['ti'].xcom_pull(task_ids='sync_state_data_' + state, key = 'school_update_list')
+    list_of_schools = context['ti'].xcom_pull(task_ids='sync_state_data_' + state, key = 'school_update_list')
     #list_of_schools = Variable.get('school_update_list')
+    #list_of_schools = ['2031030-mz30']
 
-    list_of_schools = ['2031030-mz30']
     schools_to_process = partition(list_of_schools)[chunk]
     if schools_to_process:
         #print('Got all schools')
         date_range = [Variable.get('prev_update_date'), Variable.get('curr_update_date')]
-        metric1_attendance = get_num_stud_daily(schools_to_process, state, date_range)
+        schools_data = metrics_data(schools=schools_to_process, state=state, date_range=date_range)
+
+        metric1_attendance = schools_data.get_num_stud_daily()
         load_into_db(metric1_attendance, 'metric1')
+
+        metric2_attendance = get_module_visits_daily(schools_to_process, state, date_range)
+        load_into_db(metric1_attendance, 'metric2')
+
+        metric3_attendance = get_tool_visits_daily(schools_to_process, state, date_range)
+        load_into_db(metric1_attendance, 'metric3')
+
+        metric4_attendance = get_num_idle_days(schools_to_process, state, date_range)
+        load_into_db(metric4_attendance, 'metric4')
+
         Variable.set('prev_update_date', Variable.get('curr_update_date'))
         Variable.set('curr_update_date', datetime.utcnow().date())
 
