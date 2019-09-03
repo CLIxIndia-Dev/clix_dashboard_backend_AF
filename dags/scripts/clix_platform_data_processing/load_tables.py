@@ -5,10 +5,10 @@ Engine = create_engine(SQLALCHEMY_DATABASE_URI, pool_size=POOL_SIZE, max_overflo
 
 def load_into_db(dframe, table):
     try:
-        col_map = {'date_created': 'date', 'num_stud_day_tools': 'attendance_tools', 'num_stud_day_modules': 'attendance_modules'}
+        #col_map = {'date_created': 'date', 'num_stud_day_tools': 'attendance_tools', 'num_stud_day_modules': 'attendance_modules'}
         dframe['district'] = 'mz'
         dframe['state'] = 'mz'
-        dframe = dframe.rename(columns=col_map)
+        #dframe = dframe.rename(columns=col_map)
         dframe.to_sql(table, Engine, if_exists='append', index=False)
         return 'Done'
     except Exception as e:

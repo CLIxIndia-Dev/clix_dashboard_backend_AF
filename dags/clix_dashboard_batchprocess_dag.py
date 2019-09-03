@@ -45,9 +45,8 @@ dag = DAG(
 
 for each_state in clix_config.states:
 
-    src = clix_config.local_src + each_state
+    src = clix_config.remote_src + each_state
     dst = clix_config.local_dst + each_state
-
     #sync_state_data = SSHExecuteOperator( task_id="task1",
     #bash_command= rsync -avzhe ssh {0}@{1}:{2} {3}".format(user, ip, src, dst),
     #ssh_hook=sshHook,
@@ -55,7 +54,7 @@ for each_state in clix_config.states:
 
     sync_state_data = PythonOperator(
         task_id='sync_state_data_' + each_state,
-        python_callable=sync_school_data.rsync_data_local,
+        python_callable=sync_school_data.rsync_data_ssh,
         op_kwargs={'state': each_state, 'src': src, 'dst': dst},
         dag=dag)
 

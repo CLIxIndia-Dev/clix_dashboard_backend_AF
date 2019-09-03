@@ -475,7 +475,7 @@ def get_metrics_in_daterange(schools_df, date_range):
 
     start_date = date_range[0]
     end_date = date_range[1]
-    try:           
+    try:
       schools_df['state_code'] = schools_df['school_server_code'].apply(lambda x: x.split('-')[1][:2])
       schools_df['createdat_start'] = pandas.to_datetime(schools_df['createdat_start'], format="%Y-%m-%d %H:%M:%S")
       schools_df['createdat_end'] = pandas.to_datetime(schools_df['createdat_end'], format="%Y-%m-%d %H:%M:%S")

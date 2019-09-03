@@ -22,18 +22,15 @@ def rsync_data_local(state, src, dst, **context):
     '''
     Function to sync state data from local hdd.
     '''
-
-    user = clix_config.remote_user
-    ip = clix_config.remote_ip
-    passwd = clix_config.remote_passwd
-
     def local_sync(src, dst):
-        cmd = "rsync -avzhP --stats {2} {3}".format(src, dst)
+        import pdb
+        pdb.set_trace()
+        cmd = "rsync -avzhP --stats {0} {1}".format(src, dst)
         #cmd = "rsync -avzhP --stats {0} {1}".format(src, dst)
-        rsync = pexpect.spawn(cmd, timeout=3600)
-
+        #rsync = pexpect.spawn(cmd, timeout=3600)
         try:
-            i = rsync.expect()
+            rsync = pexpect.spawn(cmd, timeout=3600)
+            #i = rsync.expect()
         except pexpect.EOF:
             print("EOF Exception for Syncing")
             raise Exception('Rysnc didnt work!')

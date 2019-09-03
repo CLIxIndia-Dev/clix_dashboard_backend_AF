@@ -41,20 +41,22 @@ def process_school_tables(state, chunk, **context):
         metric1_attendance = schools_data.get_num_stud_daily()
         load_into_db(metric1_attendance, 'metric1')
 
-        metric2_attendance = get_module_visits_daily(schools_to_process, state, date_range)
-        load_into_db(metric1_attendance, 'metric2')
+        metric2_module_engagement = schools_data.get_module_visits_daily()
+        load_into_db(metric2_module_engagement, 'metric2')
 
-        metric3_attendance = get_tool_visits_daily(schools_to_process, state, date_range)
-        load_into_db(metric1_attendance, 'metric3')
+        metric3_tool_engagement = schools_data.get_tool_visits_daily()
+        load_into_db(metric3_tool_engagement, 'metric3')
 
-        metric4_attendance = get_num_idle_days(schools_to_process, state, date_range)
-        load_into_db(metric4_attendance, 'metric4')
+        metric4_num_idle_days = schools_data.get_num_idle_days()
+        load_into_db(metric4_num_idle_days, 'metric4')
 
         Variable.set('prev_update_date', Variable.get('curr_update_date'))
         Variable.set('curr_update_date', datetime.utcnow().date())
-
+        import pdb
+        pdb.set_trace() 
         #metric2_modulevisits = get_modulevisits(schools_to_process, state, date_range)
         #status2 = load_into_db(metric2_modulevisits)
+
         #metric3_timespent = get_timespent(schools_to_process, state, date_range)
         #status3= load_into_db(metric3_timespent)
 
@@ -66,7 +68,7 @@ def process_school_tables(state, chunk, **context):
         #module_visits_table = get_modulevisits_schools(schools_to_process, modules_data)
         # To get time spent on different tools in school over time.
         #timespent_tools_table = get_timespent_schools(schools_to_process, tools_data)
-        time.sleep(10)
+        #time.sleep(10)
     else:
         print('No schools to process for this task')
 

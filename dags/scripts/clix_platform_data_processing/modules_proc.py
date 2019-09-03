@@ -213,9 +213,11 @@ def get_schools_module_data(parent_directory, schools_list, date_range, state):
 #schools_list = ['2031011-mz11', '2031020-mz20', '2031022-mz22']
 
  csv_files = get_file_paths(parent_directory, schools_list, regex_file, regex_dir, date_range)
+
  if not csv_files:
      print('No files for the given school list are found: {}'.format(schools_list))
      return pandas.DataFrame()
+
  school_prog_csv = {}
  def accumulate(l_tuples):
     iter_by_school = itertools.groupby(l_tuples, operator.itemgetter(1))
@@ -223,17 +225,24 @@ def get_schools_module_data(parent_directory, schools_list, date_range, state):
        yield school, unit_level_progress(school_data, school, state)
 
  school_prog_csv = accumulate(csv_files)
+
  schools_module_dframe = pandas.concat([data[0] for each, data  in school_prog_csv], ignore_index=True)
  schools_module_dframe = schools_module_dframe[schools_module_dframe['user_id'] > 100]
+
+ schools_server_logs = get_server_logs(csv_files)
+ #schools_server_dframe = pandas.concat([pandas.DataFrame({'school_server_code': school,
+ #'dates_server_on': dates}) for school, dates in server_logs.items()])
 
  def clean_code(x):
       if x.split('-')[0] == 'nan':
           return '-' + x.split('-')[1]
       else:
           return x
+
  def get_school_server_code(df_row):
      school_code = str(df_row['school_code']).split('.')[0]
      server_id = str(df_row['server_id'])
      return clean_code(school_code + '-' + server_id)
+
  schools_module_dframe['school_server_code'] = schools_module_dframe.apply(lambda x: get_school_server_code(x), axis=1)
- return schools_module_dframe
+ return (schools_module_dframe, schools_server_logs)
