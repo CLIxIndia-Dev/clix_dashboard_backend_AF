@@ -65,14 +65,13 @@ def rsync_data_ssh(state, src, dst, **context):
         cmd = "rsync -avzhP --stats {0}@{1}:{2} {3}".format(user, ip, src, dst)
         #cmd = "rsync -avzhP --stats {0} {1}".format(src, dst)
         rsync = pexpect.spawn(cmd, timeout=3600)
-
         try:
-            i = rsync.expect(['Password:', 'continue connecting (yes/no)?'])
+            i = rsync.expect(["{0}@{1}'s password: ".format(user, ip), 'continue connecting (yes/no)?', 'Are you sure you want to'])
             if i == 0 :
                 rsync.sendline(passwd)
-            elif i == 1:
+            elif (i == 1) or (i == 2):
                 rsync.sendline('yes')
-                rsync.expect('Password: ')
+                rsync.expect("{0}@{1}'s password: ".format(user, ip))
                 rsync.sendline(passwd)
         except pexpect.EOF:
             print("EOF Exception for Syncing")

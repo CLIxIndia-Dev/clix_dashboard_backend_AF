@@ -183,18 +183,20 @@ def unit_level_progress(list_of_file_paths, school_code, state_code):
 
 def get_server_logs(list_of_file_paths):
 
-    school_code = list_of_file_paths[0][1]
-    state_code = list_of_file_paths[0][0]
-    print('#################################')
-    print('Working on school: {0}', school_code)
-    print('###################################')
-    modified_list = defaultdict(list)
     dates_server_on = defaultdict(list)
-    for eachfile in list_of_file_paths:
-        filename = eachfile[2].split('/')[-1]
-        time_stamp = datetime.strptime(' '.join(filename.split('-')[-2:]).split('.')[0], '%Y%m%d %Hh%Mm')
-        date_stamp = time_stamp.date()
-        dates_server_on[school_code].append(date_stamp)
+    iter_by_school = itertools.groupby(list_of_file_paths, operator.itemgetter(1))
+    for school, school_csvfiles in iter_by_school:
+        school_files = [each for each in school_csvfiles]
+        school_code = school_files[0][1]
+        state_code = school_files[0][0]
+        print('#################################')
+        print('Getting server logs from school: {0}', school_code)
+        print('###################################')
+        for eachfile in school_files:
+          filename = eachfile[2].split('/')[-1]
+          time_stamp = datetime.strptime(' '.join(filename.split('-')[-2:]).split('.')[0], '%Y%m%d %Hh%Mm')
+          date_stamp = time_stamp.date()
+          dates_server_on[school_code].append(date_stamp)
     return dates_server_on
 
 def get_schools_module_data(parent_directory, schools_list, date_range, state):
@@ -216,7 +218,7 @@ def get_schools_module_data(parent_directory, schools_list, date_range, state):
 
  if not csv_files:
      print('No files for the given school list are found: {}'.format(schools_list))
-     return pandas.DataFrame()
+     return (pandas.DataFrame(), defaultdict(list))
 
  school_prog_csv = {}
  def accumulate(l_tuples):

@@ -18,7 +18,7 @@ def load_to_db(metric_data):
 
 def partition(lst, n=clix_config.num_school_chunks):
     if (len(lst) < n):
-        return [lst, [], []]
+        return [lst, [], [], []]
     else:
         division = len(lst) / n
         return [lst[round(division * i):round(division * (i + 1))] for i in range(n)]
@@ -50,10 +50,9 @@ def process_school_tables(state, chunk, **context):
         metric4_num_idle_days = schools_data.get_num_idle_days()
         load_into_db(metric4_num_idle_days, 'metric4')
 
-        Variable.set('prev_update_date', Variable.get('curr_update_date'))
-        Variable.set('curr_update_date', datetime.utcnow().date())
-        import pdb
-        pdb.set_trace() 
+        if chunk >= clix_config.num_school_chunks - 1:
+            Variable.set('prev_update_date', Variable.get('curr_update_date'))
+            Variable.set('curr_update_date', datetime.utcnow().date())
         #metric2_modulevisits = get_modulevisits(schools_to_process, state, date_range)
         #status2 = load_into_db(metric2_modulevisits)
 
@@ -69,6 +68,7 @@ def process_school_tables(state, chunk, **context):
         # To get time spent on different tools in school over time.
         #timespent_tools_table = get_timespent_schools(schools_to_process, tools_data)
         #time.sleep(10)
+
     else:
         print('No schools to process for this task')
 

@@ -1,11 +1,11 @@
 #Source and destination folders for rsync of syncthing data from prop_schools
-remote_src = 'clix_backup/sync-clix.tiss.edu/data/'
+remote_src = 'syncthing_Aug2019/data/'
 #remote_src = 'syncthing_Aug2019/data/'
 #local_src = '/home/parthae/Documents/Projects/TISS_Git/projects/CLIxData/syncthing_Aug2019/data/'
 local_dst = '/usr/local/airflow/school_syncthing_data_live/'
 
 remote_user = 'parthae'
-remote_ip = '103.36.84.176'
+remote_ip = '103.36.84.138'
 remote_passwd = 'uvceece2015'
 states = ['mz']
 num_school_chunks = 4

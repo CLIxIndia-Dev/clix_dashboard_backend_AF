@@ -4,7 +4,7 @@ from scripts.clix_platform_data_processing.get_data import get_modules_data, get
 
 import pandas
 
-modules_domain_map = {"e" : ["[u'English Beginner']", "[u'English Elementary']"],
+modules_domain_map = {"e" : ["[u'English Beginner']", "[u'English Elementary']", "[u'i2C']"],
                       "m" : ["[u'Geometric Reasoning Part I']", "[u'Geometric Reasoning Part II']", "[u'Linear Equations']",
                              "[u'Proportional Reasoning']"],
                       "s" : ["[u'Atomic Structure']", "[u'Sound']", "[u'Understanding Motion']", "[u'Basic Astronomy']",
@@ -53,15 +53,15 @@ class metrics_data:
       try:
         final_df = pandas.merge(num_stud_daily_tools, num_stud_daily_modules, how='outer', left_on=['date_created', 'school_server_code'],
         right_on=['date_created', 'school_server_code'])
-        return final_df.rename(col_map)
+        return final_df.rename(columns=col_map)
 
       except KeyError:
         if num_stud_daily_tools.empty:
             num_stud_daily_modules['num_stud_day_tools'] = 0
-            return num_stud_daily_modules.rename(col_map)
+            return num_stud_daily_modules.rename(columns=col_map)
         if num_stud_daily_modules.empty:
             num_stud_daily_tools['num_stud_day_modules'] = 0
-            return num_stud_daily_tools.rename(col_map)
+            return num_stud_daily_tools.rename(columns=col_map)
       except Exception as e:
           import pdb
           pdb.set_trace()
@@ -92,7 +92,7 @@ class metrics_data:
       if not modules_data.empty:
           num_modules_daily = modules_data.groupby(['school_server_code']).apply(lambda x: get_mod_visits(x)).reset_index(level=None)
           num_modules_daily = num_modules_daily.drop(['level_1'], axis = 1)
-          num_modules_daily = num_modules_daily.rename({'date_created': 'date'})
+          num_modules_daily = num_modules_daily.rename(columns={'date_created': 'date'})
       else:
           num_modules_daily = pandas.DataFrame()
 
@@ -120,7 +120,7 @@ class metrics_data:
       if not tools_data.empty:
           num_tools_daily = tools_data.groupby(['school_server_code']).apply(lambda x: get_tool_visits(x)).reset_index(level=None)
           num_tools_daily = num_tools_daily.drop(['level_1'], axis = 1)
-          num_tools_daily = num_tools_daily.rename({'date_created': 'date'})
+          num_tools_daily = num_tools_daily.rename(columns={'date_created': 'date'})
       else:
           num_tools_daily = pandas.DataFrame()
 
@@ -145,7 +145,7 @@ class metrics_data:
       num_idle_days_dframe = pandas.concat(schools_dframe_list)
 
       cols_required = ['school_server_code', 'days_server_wo_activity', 'tools_only_activity',
-      'module_only_activity', 'tool_with_module_activity', 'total_days_server_on']
+      'module_only_activity', 'tool_with_module_activity']
 
       num_idle_days = num_idle_days_dframe.drop_duplicates(subset=cols_required)
 
