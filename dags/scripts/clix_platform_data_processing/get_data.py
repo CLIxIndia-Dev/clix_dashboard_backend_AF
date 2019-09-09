@@ -20,7 +20,8 @@ syncthing_live_data_path = clix_config.local_dst
 
 def get_tools_data(schools_list, date_range, state):
     '''
-    To get tools data with metrics calculated per day
+    To get tools data with metrics calculated per day.
+    To get tools attendance on each day for all the schools for the dates in the daterange.
     '''
     tools_log_level_data = fetch_log_level_data_tools(syncthing_live_data_path, schools_list, state)
     if tools_log_level_data.empty:

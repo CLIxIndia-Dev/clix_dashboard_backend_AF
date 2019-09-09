@@ -28,9 +28,18 @@ def process_school_tables(state, chunk, **context):
     Function to process tables for a set of schools whose
     data has been updated through syncthing
     '''
-    list_of_schools = context['ti'].xcom_pull(task_ids='sync_state_data_' + state, key = 'school_update_list')
+    if state == 'tg':
+        state_new  = 'ts'
+    else:
+        state_new = state
+
+    list_of_schools = context['ti'].xcom_pull(task_ids='sync_state_data_' + state_new, key = 'school_update_list')
     #list_of_schools = Variable.get('school_update_list')
-    #list_of_schools = ['2031030-mz30']
+    #list_of_schools = ['4202058-tg258']
+    #list_of_schools = ['2031010-mz10', '2031030-mz30', '2031004-mz4', '2031017-mz17', '2031007-mz7',
+    #'2031009-mz9', '2031021-mz21', '2031022-mz22', '2031006-mz6', '2031025-mz25', '2031026-mz26',
+    #'2031034-mz34', '2031020-mz20', '2031016-mz16', '2031018-mz18', '2031027-mz27', '2031011-mz11',
+    #'2031033-mz33', '2031005-mz5', '2031014-mz14', '2031008-mz8', '2031028-mz28']
 
     schools_to_process = partition(list_of_schools)[chunk]
     if schools_to_process:
@@ -49,6 +58,12 @@ def process_school_tables(state, chunk, **context):
 
         metric4_num_idle_days = schools_data.get_num_idle_days()
         load_into_db(metric4_num_idle_days, 'metric4')
+
+        metric5_tools_attendance = schools_data.get_tools_attendance()
+        load_into_db(metric5_tools_attendance, 'metric5')
+
+        metric6_modules_attendance = schools_data.get_modules_attendance()
+        load_into_db(metric6_modules_attendance, 'metric6')
 
         if chunk >= clix_config.num_school_chunks - 1:
             Variable.set('prev_update_date', Variable.get('curr_update_date'))

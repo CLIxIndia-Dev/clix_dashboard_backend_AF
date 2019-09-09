@@ -24,7 +24,7 @@ class metrics_data:
         self.school_list = schools
         self.state = state
         self.date_range = date_range
-        self.tools_data = get_tools_data(self.school_list, self.date_range, self.state)
+        self.tools_data  = get_tools_data(self.school_list, self.date_range, self.state)
         (self.modules_data, self.server_log_data) = get_modules_data(self.school_list, self.date_range, self.state)
 
     def get_num_stud_daily(self):
@@ -45,7 +45,9 @@ class metrics_data:
 
       #modules_data = get_modules_data(schools, date_range, state)
       if not modules_data.empty:
-          module_data_temp = modules_data.groupby(['school_server_code', 'date_created'])['user_id'].apply(lambda x: len(x.unique())).reset_index(level=None)
+          module_data_temp = modules_data.groupby(['school_server_code', 'date_created',
+          'school_name'])['user_id'].apply(lambda x: len(x.unique())).reset_index()
+          #num_stud_daily_modules = num_stud_daily_modules.drop(['level_0'], axis = 1)
           num_stud_daily_modules = module_data_temp.rename(columns={'user_id': 'num_stud_day_modules'})
       else:
           num_stud_daily_modules = pandas.DataFrame()
@@ -157,3 +159,78 @@ class metrics_data:
       'date_created': 'date'}
 
       return num_idle_days[cols_required].rename(columns = col_map)
+
+    def get_tools_attendance(self):
+
+      schools = self.school_list
+      state = self.state
+      date_range = self.date_range
+      tools_data = self.tools_data
+
+      def get_tool_stud(school_df):
+
+          def get_users(df):
+              all_users = df['user_id'].unique()
+              num_users = len(all_users)
+
+              if '0' in all_users:
+                  anon_users = len(df[df['user_id'] == '0']['session_id'].unique()) - 1
+              else:
+                  anon_users = 0
+              return num_users + anon_users
+
+          toolwise_users_df  = school_df.groupby(['date_created', 'tool_name']).apply(lambda x: get_users(x)).reset_index()
+
+          toolwise_users_df = toolwise_users_df.rename(columns= {0: 'num_stud_tools'})
+          toolwise_users_df['tool_name_db'] = toolwise_users_df['tool_name'].apply(lambda x: 'tool' + '_' + x)
+
+          final_df = pandas.pivot_table(toolwise_users_df, values = 'num_stud_tools', index=['date_created'], columns=['tool_name_db'], fill_value=0).reset_index()
+          return final_df
+
+      if not tools_data.empty:
+          num_tools_daily = tools_data.groupby(['school_server_code']).apply(lambda x: get_tool_stud(x)).reset_index(level=None)
+          num_tools_daily = num_tools_daily.drop(['level_1'], axis = 1)
+          num_tools_daily = num_tools_daily.rename(columns={'date_created': 'date'})
+      else:
+          num_tools_daily = pandas.DataFrame()
+
+      return num_tools_daily
+
+    def get_modules_attendance(self):
+
+      schools = self.school_list
+      state = self.state
+      date_range = self.date_range
+      modules_data = self.modules_data
+
+      def get_module_stud(school_df):
+
+          def get_users(df):
+              all_users = df['user_id'].unique()
+              num_users = len(all_users)
+              return num_users
+
+          def get_module_names(module_name):
+
+              if module_name == "[u'Post-CLIx Survey']":
+                  module_name_new = 'module_Post_CLIx_Survey'
+              elif module_name == "[u'Pre-CLIx Survey']":
+                  module_name_new = 'module_Pre_CLIx_Survey'
+              else:
+                 module_name_new = 'module_' + '_'.join(module_name.split("'")[1].split(" "))
+              return module_name_new
+
+          modulewise_users_df  = school_df.groupby(['date_created', 'module_name']).apply(lambda x: get_users(x)).reset_index()
+          modulewise_users_df = modulewise_users_df.rename(columns= {0: 'num_stud_modules'})
+          modulewise_users_df['module_name_db'] = modulewise_users_df['module_name'].apply(lambda x: get_module_names(x))
+          final_df = pandas.pivot_table(modulewise_users_df, values = 'num_stud_modules', index=['date_created'], columns=['module_name_db'], fill_value=0).reset_index()
+          return final_df
+
+      if not modules_data.empty:
+          num_modules_daily = modules_data.groupby(['school_server_code']).apply(lambda x: get_module_stud(x)).reset_index(level=None)
+          num_modules_daily = num_modules_daily.drop(['level_1'], axis = 1)
+          num_modules_daily = num_modules_daily.rename(columns={'date_created': 'date'})
+      else:
+          num_modules_daily = pandas.DataFrame()
+
+      return num_modules_daily

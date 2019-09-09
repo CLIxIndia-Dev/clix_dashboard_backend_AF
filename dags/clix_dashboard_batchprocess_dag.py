@@ -65,11 +65,14 @@ for each_state in clix_config.states:
     # refer: https://stackoverflow.com/questions/55672724/airflow-creating-dynamic-tasks-from-xcom
 
     for each in list(range(clix_config.num_school_chunks)):
-
+        if each_state == 'ts':
+            each_state_new = 'tg'
+        else:
+            each_state_new = each_state
         load_state_tables = PythonOperator(
-        task_id='load_state_tables_' + str(each) + '_' + each_state,
+        task_id='load_state_tables_' + str(each) + '_' + each_state_new,
         python_callable=load_school_tables.process_school_tables,
-        op_kwargs={'state': each_state, 'chunk': each},
+        op_kwargs={'state': each_state_new, 'chunk': each},
         dag=dag)
 
         sync_state_data.set_downstream(load_state_tables)
