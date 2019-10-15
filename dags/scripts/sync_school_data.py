@@ -71,7 +71,7 @@ def rsync_data_ssh(state, src, dst, **context):
                 rsync.sendline(passwd)
             elif (i == 1) or (i == 2):
                 rsync.sendline('yes')
-                rsync.expect("{0}@{1}'s password: ".format(user, ip))
+                i = rsync.expect("{0}@{1}'s password: ".format(user, ip))
                 rsync.sendline(passwd)
         except pexpect.EOF:
             print("EOF Exception for Syncing")
@@ -84,7 +84,6 @@ def rsync_data_ssh(state, src, dst, **context):
         else:
           rsync_log = rsync.read()
           list_of_schools_updated = schools_updated(rsync_log)
-
           context['ti'].xcom_push(key='school_update_list', value=list_of_schools_updated)
           Variable.set('school_update_list', list_of_schools_updated)
           #if list_of_schools_updated:
