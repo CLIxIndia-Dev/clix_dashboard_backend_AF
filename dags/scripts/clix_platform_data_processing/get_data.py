@@ -18,6 +18,14 @@ import pandas
 
 syncthing_live_data_path = clix_config.local_dst
 
+tool_mod_map = {'ice' : ["[u'Proportional Reasoning']"], 'astroamer_element_hunt_activity' : ["[u'Basic Astronomy']"],
+                'policesquad' : ["[u'Geometric Reasoning Part I']", "[u'Geometric Reasoning Part II']"],
+                'astroamer_moon_track' : ["[u'Basic Astronomy']"],
+                'food_sharing_tool' : ["[u'Proportional Reasoning']"],
+                'astroamer_planet_trek_activity' : ["[u'Basic Astronomy']"], 'ages_puzzle' : ["[u'Linear Equations']"],
+                'coins_puzzle': ["[u'Linear Equations']"], 'factorisation': ["[u'Linear Equations']"],
+                'rationpatterns': ["[u'Proportional Reasoning']"]}
+
 def get_tools_data(schools_list, date_range, state):
     '''
     To get tools data with metrics calculated per day.
@@ -34,7 +42,7 @@ def get_modules_data(schools_list, date_range, state):
     '''
     modules_school_data, server_log_data = get_schools_module_data(syncthing_live_data_path, schools_list, date_range, state)
     if modules_school_data.empty:
-        return pandas.DataFrame()
+        return pandas.DataFrame(), defaultdict(list)
     return modules_school_data, server_log_data
 
 def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
@@ -53,12 +61,18 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
         tools_only = defaultdict(list)
         modules_only = defaultdict(list)
         modules_n_tools = defaultdict(list)
+
         #To capture users who did only tool logs and didnt appear in module usage logs
-        tool_users = set(school_tool_data['user_id'].unique())
+        if not school_tool_data.empty:
+            tool_users = set(school_tool_data['user_id'].unique())
+        else:
+            tool_users = set()
+
         module_users = set(school_dframe['user_id'].unique())
         tool_only_users = list(tool_users - module_users)
 
         # server up logs of school
+        # Code to pause if the days on which tools were used but there were no server logs registered
         server_on_dates = set(school_server_logs)
         adtnl_days = 0
         if tool_only_users and not(all([elem == 0 for elem in tool_only_users])):
@@ -78,13 +92,16 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
             '''
             df = school_dframe[school_dframe['user_id'] == each_user]
             user = each_user
-            #Tool logs of user from tools data
-            tool_logs = school_tool_data[school_tool_data["user_id"] == user]
 
-            tool_logs['createdat_end'] = pandas.to_datetime(tool_logs["createdat_end"], format="%Y-%m-%d %H:%M:%S")
+            #Tool logs of user from tools data
+            if not school_tool_data.empty:
+                tool_logs = school_tool_data[school_tool_data["user_id"] == user]
+                tool_logs['createdat_end'] = pandas.to_datetime(tool_logs["createdat_end"], format="%Y-%m-%d %H:%M:%S")
+            else:
+                tool_logs = pandas.DataFrame()
+
             # Module activity logs of user
             module_dates = df['timestamp'].tolist()
-
             if tool_logs.empty:
                 # If tool_logs is empty, there was no tool activity for user, only module activity was there
                 tools_only[user].append(None)
@@ -94,11 +111,12 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
                 modul_tool_capture = list()
                 # Tool activity was there for this user
                 for each_row in tool_logs.iterrows():
+
                     tool_module = tool_mod_map[each_row[1]['tool_name']]
                     each_tool_ts = each_row[1]['createdat_end']
+
                     # Get all the module activities after the tool log happened
                     # which correspond to the same module as tool
-
                     module_dates_df = df[df['module_name'].isin(tool_module)]
 
                     if not(module_dates_df.empty):
@@ -118,6 +136,7 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
                         modules_n_tools[user].append(mod_activ_capture)
                         #Picking module logs which are overlapping with tools
                         modul_tool_capture.append(mod_activ_capture)
+
             if modul_tool_capture:
                 modul_only_dates = [each for each in module_dates if not(pandas.Series([each]).isin(modul_tool_capture)[0])]
                 for each in modul_only_dates:
@@ -126,6 +145,7 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
                 modul_only_dates = module_dates
                 for each in modul_only_dates:
                     modules_only[user].append(each)
+
 
         logs_tools_only = set([log.date() for tool_logs in tools_only.values() for log in tool_logs if log])
 

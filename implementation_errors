@@ -1,0 +1,7 @@
+# 1st Oct, 2019:
+1. Need to consider cases of no tools data in school gstudio folder. This was throwing error for mz82 and mz87.
+2. Have added a variable to capture schools updated on every day. Only when there is gstudio folder in synced folder, 
+   a school is registered in the variable.
+3. Empty data could be due to the date range given also
+4. When generating data for lab usage, we consider only latest time interval of observation. So get the aggregate numbers for
+   all the days so far, need to add up the increments for each column.

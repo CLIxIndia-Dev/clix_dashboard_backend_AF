@@ -1,5 +1,5 @@
 #Source and destination folders for rsync of syncthing data from prop_schools
-remote_src = 'CLIxDashboard/LiveSyncthingData/data/'
+#remote_src = '/home/parthae/CLIxDashboard/LiveSyncthingData/data/'
 #remote_src = 'syncthing_Aug2019/data/'
 #local_src = '/home/parthae/Documents/Projects/TISS_Git/projects/CLIxData/syncthing_Aug2019/data/'
 local_dst = '/usr/local/airflow/school_syncthing_data_live/'

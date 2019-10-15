@@ -11,6 +11,12 @@ import config.clix_config as clix_config
 from datetime import datetime
 
 from airflow.models import Variable
+import json
+
+def append_school_list(school_update_info, list_of_schools_updated):
+    index = str(int(max([key.split('_')[1] for key in school_update_info.keys()])) + 1)
+    school_update_info["syncInfo_" + index] = {"date": str(datetime.utcnow().date()), "schools": list_of_schools_updated}
+    return json.dumps(school_update_info)
 
 def schools_updated(rsync_log):
     log_text = rsync_log.decode('utf-8')
@@ -85,10 +91,12 @@ def rsync_data_ssh(state, src, dst, **context):
           rsync_log = rsync.read()
           list_of_schools_updated = schools_updated(rsync_log)
           context['ti'].xcom_push(key='school_update_list', value=list_of_schools_updated)
-          Variable.set('school_update_list', list_of_schools_updated)
+          school_update_info = Variable.get('clix_variables_config', deserialize_json=True)
+          Variable.set('clix_variables_config', append_school_list(school_update_info, list_of_schools_updated))
+
           #if list_of_schools_updated:
-        #     Variable.set('prev_update_date', Variable.get('curr_update_date'))
-        #     Variable.set('curr_update_date', datetime.utcnow())
+          #     Variable.set('prev_update_date', Variable.get('curr_update_date'))
+          #     Variable.set('curr_update_date', datetime.utcnow())
           rsync.close()
 
     return ssh_sync(src, dst)

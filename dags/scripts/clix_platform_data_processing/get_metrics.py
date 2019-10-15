@@ -17,6 +17,8 @@ tools_domain_map = {
         's': ['astroamer_element_hunt_activity', 'astroamer_moon_track', 'astroamer_planet_trek_activity']
     }
 
+
+
 class metrics_data:
 
     def __init__(self, schools, state, date_range):
@@ -137,17 +139,35 @@ class metrics_data:
       modules_data = self.modules_data
       server_log_data = self.server_log_data
 
-      schools_dframe_list = []
+      def get_lab_usage_tools(tools_data):
+        num_idle_days_dframe = tools_data.groupby(['school_server_code']).apply(lambda x: len(x['date_created'].unique())).reset_index()
+        num_idle_days_dframe = num_idle_days_dframe.rename(columns={0: 'tools_only_activity'})
+        num_idle_days_dframe['days_server_wo_activity'] = 0
+        num_idle_days_dframe['module_only_activity'] = 0
+        num_idle_days_dframe['tool_with_module_activity'] = 0
+        num_idle_days_dframe['total_days_server_on'] = num_idle_days_dframe['tools_only_activity']
+        return num_idle_days_dframe
 
-      for each_school, data in server_log_data.items():
-          school_mod_df = modules_data[modules_data['school_server_code'] == each_school]
-          school_tool_df = tools_data[tools_data['school_server_code'] == each_school]
-          schools_dframe_list.append(get_lab_usage(school_mod_df, school_tool_df, data))
+      if modules_data.empty:
+        num_idle_days_dframe =  pandas.DataFrame()
+        if not tools_data.empty:
+            num_idle_days_dframe = get_lab_usage_tools(tools_data)
+        else:
+            return pandas.DataFrame()
+      else:
+        schools_dframe_list = []
+        for each_school, data in server_log_data.items():
+            school_mod_df = modules_data[modules_data['school_server_code'] == each_school]
+            if not tools_data.empty:
+                school_tool_df = tools_data[tools_data['school_server_code'] == each_school]
+            else:
+                school_tool_df = pandas.DataFrame()
+            schools_dframe_list.append(get_lab_usage(school_mod_df, school_tool_df, data))
 
-      num_idle_days_dframe = pandas.concat(schools_dframe_list)
+        num_idle_days_dframe = pandas.concat(schools_dframe_list)
 
       cols_required = ['school_server_code', 'days_server_wo_activity', 'tools_only_activity',
-      'module_only_activity', 'tool_with_module_activity']
+        'module_only_activity', 'tool_with_module_activity']
 
       num_idle_days = num_idle_days_dframe.drop_duplicates(subset=cols_required)
 
@@ -155,8 +175,8 @@ class metrics_data:
 
       cols_required = cols_required + ['date_created']
       col_map = {'days_server_wo_activity': 'days_server_idle', 'tools_only_activity': 'days_server_tools',
-      'module_only_activity': 'days_server_modules', 'tool_with_module_activity': 'days_server_tools_modules',
-      'date_created': 'date'}
+        'module_only_activity': 'days_server_modules', 'tool_with_module_activity': 'days_server_tools_modules',
+        'date_created': 'date'}
 
       return num_idle_days[cols_required].rename(columns = col_map)
 
