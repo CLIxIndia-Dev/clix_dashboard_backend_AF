@@ -1,2 +1,4 @@
 school_syncthing_data_live
-__pycache__
+__pycache_
+*.pyc
+*.swp_

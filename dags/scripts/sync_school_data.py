@@ -77,7 +77,7 @@ def rsync_data_ssh(state, src, dst, **context):
                 rsync.sendline(passwd)
             elif (i == 1) or (i == 2):
                 rsync.sendline('yes')
-                rsync.expect("{0}@{1}'s password: ".format(user, ip))
+                i = rsync.expect("{0}@{1}'s password: ".format(user, ip))
                 rsync.sendline(passwd)
         except pexpect.EOF:
             print("EOF Exception for Syncing")

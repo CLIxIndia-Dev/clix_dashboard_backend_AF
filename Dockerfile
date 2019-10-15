@@ -75,6 +75,13 @@ RUN set -ex \
 COPY script/entrypoint.sh /entrypoint.sh
 COPY config/airflow.cfg ${AIRFLOW_USER_HOME}/airflow.cfg
 
+ARG DOCKER_UID
+RUN \
+    : "${DOCKER_UID:?Build argument DOCKER_UID needs to be set and non-empty. Use 'make build' to set it automatically.}" \
+    && usermod -u ${DOCKER_UID} airflow \
+    && echo "Set airflow's uid to ${DOCKER_UID}"
+
+
 RUN chown -R airflow: ${AIRFLOW_USER_HOME}
 
 EXPOSE 8080 5555 8793
