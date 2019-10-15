@@ -34,6 +34,7 @@ def process_school_tables(state, chunk, **context):
         state_new = state
 
     list_of_schools = context['ti'].xcom_pull(task_ids='sync_state_data_' + state_new, key = 'school_update_list')
+    #list_of_schools = ['2011010-mz87']
     #list_of_schools = Variable.get('school_update_list')
     #list_of_schools = ['4202058-tg258']
     #list_of_schools = ['2031010-mz10', '2031030-mz30', '2031004-mz4', '2031017-mz17', '2031007-mz7',
@@ -42,6 +43,7 @@ def process_school_tables(state, chunk, **context):
     #'2031033-mz33', '2031005-mz5', '2031014-mz14', '2031008-mz8', '2031028-mz28']
 
     schools_to_process = partition(list_of_schools)[chunk]
+    print(schools_to_process)
     if schools_to_process:
         #print('Got all schools')
         date_range = [Variable.get('prev_update_date'), Variable.get('curr_update_date')]
