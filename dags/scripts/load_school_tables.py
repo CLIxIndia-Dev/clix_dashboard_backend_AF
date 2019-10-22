@@ -30,11 +30,14 @@ def process_school_tables(state, chunk, **context):
     '''
     if state == 'tg':
         state_new  = 'ts'
+    if state == 'ct':
+        state_new = 'cg'
     else:
         state_new = state
 
     list_of_schools = context['ti'].xcom_pull(task_ids='sync_state_data_' + state_new, key = 'school_update_list')
-    #list_of_schools = ['2011010-mz87']
+    #list_of_schools = ["4112005-tg205", "4202052-tg252", "4141045-tg145", "4231036-tg136", "4221067-tg167", "4183023-tg23",
+    #"4152092-tg292", "4221034-tg134", "4202058-tg258", "4202003-tg203", "4202057-tg257", "4231058-tg158"]
     #list_of_schools = Variable.get('school_update_list')
     #list_of_schools = ['4202058-tg258']
     #list_of_schools = ['2031010-mz10', '2031030-mz30', '2031004-mz4', '2031017-mz17', '2031007-mz7',
@@ -46,7 +49,7 @@ def process_school_tables(state, chunk, **context):
     print(schools_to_process)
     if schools_to_process:
         #print('Got all schools')
-        date_range = [Variable.get('prev_update_date'), Variable.get('curr_update_date')]
+        date_range = [Variable.get('prev_update_date_' + state), Variable.get('curr_update_date_' + state)]
         schools_data = metrics_data(schools=schools_to_process, state=state, date_range=date_range)
 
         metric1_attendance = schools_data.get_num_stud_daily()
@@ -68,8 +71,8 @@ def process_school_tables(state, chunk, **context):
         load_into_db(metric6_modules_attendance, 'metric6')
 
         if chunk >= clix_config.num_school_chunks - 1:
-            Variable.set('prev_update_date', Variable.get('curr_update_date'))
-            Variable.set('curr_update_date', datetime.utcnow().date())
+            Variable.set('prev_update_date_' + state, Variable.get('curr_update_date_' + state))
+            Variable.set('curr_update_date_' + state, datetime.utcnow().date())
         #metric2_modulevisits = get_modulevisits(schools_to_process, state, date_range)
         #status2 = load_into_db(metric2_modulevisits)
 

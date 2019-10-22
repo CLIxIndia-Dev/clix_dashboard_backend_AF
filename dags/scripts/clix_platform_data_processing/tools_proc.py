@@ -24,6 +24,7 @@ import logging
 import operator
 import itertools
 import pandas
+import numpy
 
 def get_state_school_json(json_file_path):
     path_items = json_file_path.split('/')
@@ -349,11 +350,18 @@ def get_time_spent(df):
             def get_minute(x):
                 try:
                     ts = x['time_spent']
-                    if (len(ts.split(':')) > 1):
+                    if isinstance(ts, int) or isinstance(ts, numpy.int64):
+                       hh_minut = int(ts) * 60
+                       minut_minut = 0
+                       sec_minut = 0
+                    elif (len(ts.split(':')) > 1):
                        hh_minut = int(ts.split(':')[0]) * 60
                        minut_minut = int(ts.split(':')[1])
                        sec_minut = float(ts.split(':')[2]) / 60
                     else:
+                       print('New type for timespent in policesquad')
+                       import pdb
+                       pdb.set_trace()
                        hh_minut = int(ts) * 60
                        minut_minut = 0
                        sec_minut = 0

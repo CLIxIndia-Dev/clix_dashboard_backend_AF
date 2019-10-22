@@ -58,7 +58,7 @@ def rsync_data_local(state, src, dst, **context):
 
     return local_sync(src, dst)
 
-def rsync_data_ssh(state, src, dst, **context):
+def rsync_data_ssh(state, src, dst, static_flag, **context):
     '''
     Function to sync state data through ssh.
     '''
@@ -91,7 +91,10 @@ def rsync_data_ssh(state, src, dst, **context):
           rsync_log = rsync.read()
           list_of_schools_updated = schools_updated(rsync_log)
           context['ti'].xcom_push(key='school_update_list', value=list_of_schools_updated)
-          school_update_info = Variable.get('clix_variables_config', deserialize_json=True)
+          if static_flag:
+              school_update_info = Variable.get('clix_variables_config_static_vis', deserialize_json=True)
+          else:
+              school_update_info = Variable.get('clix_variables_config_schooldb', deserialize_json=True)
           Variable.set('clix_variables_config', append_school_list(school_update_info, list_of_schools_updated))
 
           #if list_of_schools_updated:
