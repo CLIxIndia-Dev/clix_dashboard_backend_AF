@@ -67,8 +67,11 @@ for each_state in clix_config.states:
     for each in list(range(clix_config.num_school_chunks)):
         if each_state == 'ts':
             each_state_new = 'tg'
+        elif each_state == 'cg':
+            each_state_new = 'ct'
         else:
             each_state_new = each_state
+        
         load_state_tables = PythonOperator(
         task_id='load_state_tables_' + str(each) + '_' + each_state_new,
         python_callable=load_school_tables.process_school_tables,
