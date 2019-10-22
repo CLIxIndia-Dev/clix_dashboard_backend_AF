@@ -24,7 +24,7 @@ import logging
 import operator
 import itertools
 import pandas
-import numpy 
+import numpy
 
 def get_state_school_json(json_file_path):
     path_items = json_file_path.split('/')
@@ -350,7 +350,7 @@ def get_time_spent(df):
             def get_minute(x):
                 try:
                     ts = x['time_spent']
-                    if (isinstance(ts, int) or isinstance(ts, numpy.int64)):
+                    if isinstance(ts, int) or isinstance(ts, numpy.int64):
                        hh_minut = int(ts) * 60
                        minut_minut = 0
                        sec_minut = 0

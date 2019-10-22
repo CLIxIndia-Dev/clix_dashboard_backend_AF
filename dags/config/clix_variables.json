@@ -1,9 +1,23 @@
 {
-	"clix_variables_config": {
+	"clix_variables_config_schooldb": {
 		"syncInfo_0": {
 			"date": "2019-10-13",
 			"schools": []
 
 		}
+	},
+	"clix_variables_config_static_vis": {
+		"syncInfo_0": {
+			"date": "2019-10-13",
+			"schools": []
+
+		}
+	},
+
+	"static_vis_range": {
+		"months_list": ["all_months", "Jul2018", "Aug2018", "Sep2018", "Oct2018", "Nov2018",
+			"Dec2018", "Jan2019", "Feb2019", "Mar2019", "Apr2019", "May2019", "Jun2019",
+			"Jul2019", "Aug2019", "Sep2019", "Oct2019"]
 	}
+
 }
