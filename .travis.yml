@@ -1,0 +1,17 @@
+language: python
+python:
+ - "3.6"
+
+services:
+ - docker 
+
+before_script: pip install docker-compose 
+
+install: 
+ - pip install -r mock_pipeline_tests/requirements.txt
+
+script:
+ - flak8
+ - docker-compose run --rm webserver coverage run -m pytest mock_pipeline_tests/*  
+ 
+
