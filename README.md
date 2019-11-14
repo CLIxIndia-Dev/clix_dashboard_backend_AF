@@ -1,5 +1,5 @@
 # clix_dashboard_backend_AF
-[![TravisCI](https://travis-ci.org/Pardhu448/clix_dashboard_backend_AF)]
+[![TravisCI]()]
 Batch processing part of CLIx dashboard backend. Implemented with Airflow. 
 
 # docker-airflow
