@@ -2,3 +2,5 @@ school_syncthing_data_live
 __pycache__
 *.pyc
 *.swp_
+state_level_data_logs
+syncthing_data_static_vis
