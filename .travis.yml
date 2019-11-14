@@ -9,6 +9,6 @@ before_script: pip install docker-compose
 
 script:
  - flake8
- - docker-compose run --rm webserver coverage run -m pytest mock_pipeline_tests/*  
+ - docker-compose run --rm webserver coverage run -m pytest dags/mock_pipeline_tests/*  
  
 
