@@ -3,15 +3,16 @@
 		"syncInfo_0": {
 			"date": "2019-10-13",
 			"schools": []
+    },
+		"schools_synced_so_far":[]
+		},
 
-		}
-	},
 	"clix_variables_config_static_vis": {
 		"syncInfo_0": {
 			"date": "2019-10-13",
 			"schools": []
-
-		}
+		},
+		"schools_synced_so_far":[]
 	},
 
 	"static_vis_range": {

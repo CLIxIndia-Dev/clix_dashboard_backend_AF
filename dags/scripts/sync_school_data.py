@@ -16,6 +16,8 @@ import json
 def append_school_list(school_update_info, list_of_schools_updated):
     index = str(int(max([key.split('_')[1] for key in school_update_info.keys()])) + 1)
     school_update_info["syncInfo_" + index] = {"date": str(datetime.utcnow().date()), "schools": list_of_schools_updated}
+    list_of_schools_updated_latest = list(set(school_update_info["schools_synced_so_far"].append(list_of_schools_updated)))
+    school_update_info["schools_synced_so_far"] = list_of_schools_updated_latest
     return json.dumps(school_update_info)
 
 def schools_updated(rsync_log):
@@ -91,12 +93,14 @@ def rsync_data_ssh(state, src, dst, static_flag, **context):
           rsync_log = rsync.read()
           list_of_schools_updated = schools_updated(rsync_log)
           context['ti'].xcom_push(key='school_update_list', value=list_of_schools_updated)
-          if static_flag:
-              school_update_info = Variable.get('clix_variables_config_static_vis', deserialize_json=True)
-              Variable.set('clix_variables_config_static_vis', append_school_list(school_update_info, list_of_schools_updated))
-          else:
-              school_update_info = Variable.get('clix_variables_config_schooldb', deserialize_json=True)
-              Variable.set('clix_variables_config_schooldb', append_school_list(school_update_info, list_of_schools_updated))
+          # Change tracking variables only if there is any school synced
+          if len(list_of_schools_updated) != 0:
+             if static_flag:
+               school_update_info = Variable.get('clix_variables_config_static_vis', deserialize_json=True)
+               Variable.set('clix_variables_config_static_vis', append_school_list(school_update_info, list_of_schools_updated))
+             else:
+               school_update_info = Variable.get('clix_variables_config_schooldb', deserialize_json=True)
+               Variable.set('clix_variables_config_schooldb', append_school_list(school_update_info, list_of_schools_updated))
 
           #if list_of_schools_updated:
           #     Variable.set('prev_update_date', Variable.get('curr_update_date'))
