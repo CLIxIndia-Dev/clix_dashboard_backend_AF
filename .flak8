@@ -1,0 +1,4 @@
+[flak8]
+exclude = 
+ __pycache__
+ 
