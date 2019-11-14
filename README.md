@@ -1,4 +1,5 @@
 # clix_dashboard_backend_AF
+https://travis-ci.org/Pardhu448/clix_dashboard_backend_AF.svg?branch=master
 Batch processing part of CLIx dashboard backend. Implemented with Airflow. 
 
 # docker-airflow
