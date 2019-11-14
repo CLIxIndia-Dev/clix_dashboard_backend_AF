@@ -13,3 +13,9 @@
 # 20th Oct, 2019:
 1. when creating new volume in airflow directory, make sure that 'airflow' inside airflow docker has same userid as the host of the docker. Find the 
 userid of host using 'user -id show' and pass it as argument 'DOCKER_UID'
+
+# 4th Nov, 2019:
+1. We didnt consider the possibility of a school synced for the first time, in which case we would have prev_update_date and curr_update_date not reflecting the 
+   actual time period for which a school needs to be processed. Need to store prev_update_date and curr_update_date for very school in every state. Currently, we
+   are doing it at state level.
+
