@@ -17,7 +17,7 @@ services:
       args:
         AIRFLOW_DEPS: gcp_api,s3
         PYTHON_DEPS:
-        DOCKER_UID: 1000
+        DOCKER_UID: 1002
     restart: always
     depends_on:
       - postgres

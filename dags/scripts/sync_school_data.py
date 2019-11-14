@@ -93,9 +93,10 @@ def rsync_data_ssh(state, src, dst, static_flag, **context):
           context['ti'].xcom_push(key='school_update_list', value=list_of_schools_updated)
           if static_flag:
               school_update_info = Variable.get('clix_variables_config_static_vis', deserialize_json=True)
+              Variable.set('clix_variables_config_static_vis', append_school_list(school_update_info, list_of_schools_updated))
           else:
               school_update_info = Variable.get('clix_variables_config_schooldb', deserialize_json=True)
-          Variable.set('clix_variables_config', append_school_list(school_update_info, list_of_schools_updated))
+              Variable.set('clix_variables_config_schooldb', append_school_list(school_update_info, list_of_schools_updated))
 
           #if list_of_schools_updated:
           #     Variable.set('prev_update_date', Variable.get('curr_update_date'))
