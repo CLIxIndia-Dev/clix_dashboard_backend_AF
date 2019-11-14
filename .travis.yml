@@ -11,7 +11,7 @@ install:
  - pip install -r mock_pipeline_tests/requirements.txt
 
 script:
- - flak8
+ - flake8
  - docker-compose run --rm webserver coverage run -m pytest mock_pipeline_tests/*  
  
 
