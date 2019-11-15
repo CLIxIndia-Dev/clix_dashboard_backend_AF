@@ -20,7 +20,9 @@ def append_school_list(school_update_info, list_of_schools_updated, state):
     index = str(int(max([key.split('_')[1] for key in school_update_info_state.keys() if re_obj.match(key)])) + 1)
     school_update_info[state]["syncInfo_" + index] = {"date": str(datetime.utcnow().date()), "schools": list_of_schools_updated}
     if len(school_update_info_state["schools_synced_so_far"]) != 0:
-       list_of_schools_updated_latest = list(set(school_update_info[state]["schools_synced_so_far"].append(list_of_schools_updated)))
+       schools_so_far = school_update_info[state]["schools_synced_so_far"]
+       schools_so_far.extend(list_of_schools_updated)
+       list_of_schools_updated_latest = list(set(schools_so_far))
     else:
        list_of_schools_updated_latest = list_of_schools_updated
 
