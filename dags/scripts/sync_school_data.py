@@ -12,12 +12,19 @@ from datetime import datetime
 
 from airflow.models import Variable
 import json
+import re 
 
-def append_school_list(school_update_info, list_of_schools_updated):
-    index = str(int(max([key.split('_')[1] for key in school_update_info.keys()])) + 1)
-    school_update_info["syncInfo_" + index] = {"date": str(datetime.utcnow().date()), "schools": list_of_schools_updated}
-    list_of_schools_updated_latest = list(set(school_update_info["schools_synced_so_far"].append(list_of_schools_updated)))
-    school_update_info["schools_synced_so_far"] = list_of_schools_updated_latest
+def append_school_list(school_update_info, list_of_schools_updated, state):
+    re_obj = re.compile( '.*' + re.escape('syncInfo') + '*.')
+    school_update_info_state = school_update_info[state]
+    index = str(int(max([key.split('_')[1] for key in school_update_info_state.keys() if re_obj.match(key)])) + 1)
+    school_update_info[state]["syncInfo_" + index] = {"date": str(datetime.utcnow().date()), "schools": list_of_schools_updated}
+    if len(school_update_info_state["schools_synced_so_far"]) != 0:
+       list_of_schools_updated_latest = list(set(school_update_info[state]["schools_synced_so_far"].append(list_of_schools_updated)))
+    else:
+       list_of_schools_updated_latest = list_of_schools_updated
+
+    school_update_info[state]["schools_synced_so_far"] = list_of_schools_updated_latest
     return json.dumps(school_update_info)
 
 def schools_updated(rsync_log):
@@ -97,10 +104,10 @@ def rsync_data_ssh(state, src, dst, static_flag, **context):
           if len(list_of_schools_updated) != 0:
              if static_flag:
                school_update_info = Variable.get('clix_variables_config_static_vis', deserialize_json=True)
-               Variable.set('clix_variables_config_static_vis', append_school_list(school_update_info, list_of_schools_updated))
+               Variable.set('clix_variables_config_static_vis', append_school_list(school_update_info, list_of_schools_updated, state))
              else:
                school_update_info = Variable.get('clix_variables_config_schooldb', deserialize_json=True)
-               Variable.set('clix_variables_config_schooldb', append_school_list(school_update_info, list_of_schools_updated))
+               Variable.set('clix_variables_config_schooldb', append_school_list(school_update_info, list_of_schools_updated, state))
 
           #if list_of_schools_updated:
           #     Variable.set('prev_update_date', Variable.get('curr_update_date'))

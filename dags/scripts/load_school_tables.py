@@ -37,18 +37,19 @@ def process_school_tables(state, chunk, **context):
 
     list_of_schools = context['ti'].xcom_pull(task_ids='sync_state_data_' + state_new, key = 'school_update_list')
     # To check is there is any school which is synced for the first time
-    list_of_old_schools = Variable.get('clix_variables_config_schooldb', deserialize_json=True)["schools_synced_so_far"]
+    list_of_old_schools = Variable.get('clix_variables_config_schooldb', deserialize_json=True)[state_new]["schools_synced_so_far"]
 
-    list_of_schools_new = list(set(list_of_old_schools) - set(list_of_schools))
+    list_of_schools_new = list(set(list_of_schools) - set(list_of_old_schools))
 
     if len(list_of_schools_new) != 0:
         schools_to_process_new = partition(list_of_schools_new)[chunk]
+    else:
+        schools_to_process_new = []
 
     schools_to_process = partition(list_of_schools)[chunk]
 
     print(schools_to_process)
     print(schools_to_process_new)
-
 
     if schools_to_process:
         #print('Got all schools')
