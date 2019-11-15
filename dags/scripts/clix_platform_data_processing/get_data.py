@@ -26,6 +26,11 @@ tool_mod_map = {'ice' : ["[u'Proportional Reasoning']"], 'astroamer_element_hunt
                 'coins_puzzle': ["[u'Linear Equations']"], 'factorisation': ["[u'Linear Equations']"],
                 'rationpatterns': ["[u'Proportional Reasoning']"]}
 
+all_modules = ["[u'Proportional Reasoning']", "[u'Basic Astronomy']",
+                "[u'Geometric Reasoning Part I']", "[u'Geometric Reasoning Part II']",
+                "[u'Basic Astronomy']", "[u'Proportional Reasoning']", "[u'Basic Astronomy']", "[u'Linear Equations']",
+                "[u'Linear Equations']", "[u'Linear Equations']", "[u'Proportional Reasoning']"]
+
 def get_tools_data(schools_list, date_range, state):
     '''
     To get tools data with metrics calculated per day.
@@ -111,8 +116,12 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
                 modul_tool_capture = list()
                 # Tool activity was there for this user
                 for each_row in tool_logs.iterrows():
-
+                    #If we consider only those modules which correspond to a tool based on the
+                    # mapping tool_mod_map
                     tool_module = tool_mod_map[each_row[1]['tool_name']]
+                    # Here we are using all modules, without considering only those
+                    # modules which are mapped to a particular tool as in tool_mod_map
+                    #tool_module = all_modules
                     each_tool_ts = each_row[1]['createdat_end']
 
                     # Get all the module activities after the tool log happened
