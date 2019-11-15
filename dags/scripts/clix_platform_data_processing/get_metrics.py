@@ -165,7 +165,7 @@ class metrics_data:
             schools_dframe_list.append(get_lab_usage(school_mod_df, school_tool_df, data))
 
         num_idle_days_dframe = pandas.concat(schools_dframe_list)
-
+      
       cols_required = ['school_server_code', 'days_server_wo_activity', 'tools_only_activity',
         'module_only_activity', 'tool_with_module_activity']
 
