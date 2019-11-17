@@ -100,7 +100,7 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
 
             #Tool logs of user from tools data
             if not school_tool_data.empty:
-                tool_logs = school_tool_data[school_tool_data["user_id"] == user]
+                tool_logs = school_tool_data[school_tool_data["user_id"] == str(user)]
                 tool_logs['createdat_end'] = pandas.to_datetime(tool_logs["createdat_end"], format="%Y-%m-%d %H:%M:%S")
             else:
                 tool_logs = pandas.DataFrame()
