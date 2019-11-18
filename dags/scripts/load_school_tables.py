@@ -36,6 +36,7 @@ def process_school_tables(state, chunk, **context):
         state_new = state
 
     list_of_schools = context['ti'].xcom_pull(task_ids='sync_state_data_' + state_new, key = 'school_update_list')
+    
     # To check is there is any school which is synced for the first time
     list_of_old_schools = Variable.get('clix_variables_config_schooldb', deserialize_json=True)[state_new]["schools_synced_so_far"]
 

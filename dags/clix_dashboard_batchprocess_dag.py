@@ -18,7 +18,7 @@ import config.clix_config as clix_config
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': airflow.utils.dates.days_ago(1),
+    'start_date': datetime(2019, 11, 18),
     #'email': ['airflow@example.com'],
     'email_on_failure': False,
     'email_on_retry': False,
@@ -33,7 +33,7 @@ default_args = {
 
 dag = DAG(
     'clix_dashboard_batchprocess_dag', default_args=default_args,
-    schedule_interval=timedelta(hours=24))
+    schedule_interval=timedelta(hours=27))
 
 # --------------------------------------------------------------------------------
 # Each state is synced independently. We have four states and syncthing data folders
