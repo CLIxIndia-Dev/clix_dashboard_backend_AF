@@ -36,7 +36,6 @@ def process_school_tables(state, chunk, **context):
         state_new = state
 
     list_of_schools = context['ti'].xcom_pull(task_ids='sync_state_data_' + state_new, key = 'school_update_list')
-    
     # To check is there is any school which is synced for the first time
     list_of_old_schools = Variable.get('clix_variables_config_schooldb', deserialize_json=True)[state_new]["schools_synced_so_far"]
 
@@ -55,6 +54,8 @@ def process_school_tables(state, chunk, **context):
     if schools_to_process:
         #print('Got all schools')
         date_range = [Variable.get('prev_update_date_' + state), Variable.get('curr_update_date_' + state)]
+        
+        #date_range = ['2018-07-01', Variable.get('curr_update_date_' + state)]
         schools_data = metrics_data(schools=schools_to_process, state=state, date_range=date_range)
 
         metric1_attendance = schools_data.get_num_stud_daily()

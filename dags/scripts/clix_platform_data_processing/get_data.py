@@ -83,10 +83,11 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
         if tool_only_users and not(all([elem == 0 for elem in tool_only_users])):
            adtnl_tool_logs = school_tool_data.loc[school_tool_data['user_id'].isin(tool_only_users)]['createdat_end'].unique()
            adtnl_tool_logs_new = pandas.Series(pandas.to_datetime(adtnl_tool_logs, format="%Y-%m-%d %H:%M:%S")).apply(lambda x: str(x.date()))
-           adtnl_days = len(set(adtnl_tool_logs_new) - server_on_dates)
+           # Issue with comparing string with datetime object resulted in error in finding the difference of sets
+           adtnl_days = len(set(adtnl_tool_logs_new) - set([str(each) for each in server_on_dates]))
            if not(adtnl_days == 0 or adtnl_days == 1):
                pass
-
+      
         for each_user in school_dframe['user_id'].unique():
             '''
             This code tries to find the non-overlapping access of tools and modules section of the platform

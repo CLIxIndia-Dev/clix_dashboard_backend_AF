@@ -58,7 +58,7 @@ class metrics_data:
         final_df = pandas.merge(num_stud_daily_tools, num_stud_daily_modules, how='outer', left_on=['date_created', 'school_server_code'],
         right_on=['date_created', 'school_server_code'])
         return final_df.rename(columns=col_map)
-
+      
       except KeyError:
         if num_stud_daily_tools.empty:
             num_stud_daily_modules['num_stud_day_tools'] = 0
