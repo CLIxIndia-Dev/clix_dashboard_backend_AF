@@ -32,7 +32,7 @@ services:
       - ./requirements.txt:/requirements.txt
       - ./school_syncthing_data_live:/usr/local/airflow/school_syncthing_data_live
       - ./syncthing_data_static_vis:/usr/local/airflow/syncthing_data_static_vis 
-      - ./state_level_data_logs:/usr/local/airflow/state_level_data_logs  
+      - ./state_level_data_logs:/usr/local/airflow/state_level_data_logs
     ports:
       - "8080:8080"
     command: webserver
