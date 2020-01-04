@@ -61,7 +61,7 @@ for each_state in clix_config.static_visuals_states:
         task_id='sync_state_data_' + each_state,
         python_callable=sync_school_data.rsync_data_ssh,
         op_kwargs={'state': each_state, 'src': src, 'dst': dst, 'static_flag': True},
-        dag=dag)
+        dag=dag, retries=0)
 
     # For parallel processing of files in the list of schools updated
     # we use three parallel tasks each taking the portion of the list
