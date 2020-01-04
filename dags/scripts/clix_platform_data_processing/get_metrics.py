@@ -177,7 +177,6 @@ class metrics_data:
       col_map = {'days_server_wo_activity': 'days_server_idle', 'tools_only_activity': 'days_server_tools',
         'module_only_activity': 'days_server_modules', 'tool_with_module_activity': 'days_server_tools_modules',
         'date_created': 'date'}
-
       return num_idle_days[cols_required].rename(columns = col_map)
 
     def get_tools_attendance(self):
