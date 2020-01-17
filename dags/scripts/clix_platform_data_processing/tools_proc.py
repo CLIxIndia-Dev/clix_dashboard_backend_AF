@@ -366,6 +366,7 @@ def get_time_spent(df):
                        minut_minut = 0
                        sec_minut = 0
                 except Exception as e:
+                    print('Time stamp that went wrong - {0}'.format(ts))
                     import pdb
                     pdb.set_trace()
 
