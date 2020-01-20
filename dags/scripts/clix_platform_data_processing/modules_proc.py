@@ -70,9 +70,11 @@ def get_file_paths(data_path, schools_list, regex_file, regex_dir, date_range):
                                 date_copied_ft = datetime.strptime(date_copied, "%Y-%m-%d")
                                 up_bound = datetime.strptime(date_range[1], "%Y-%m-%d")
                                 low_bound = datetime.strptime(date_range[0], "%Y-%m-%d")
-                                if (low_bound <= date_copied_ft <= up_bound):
-                                    FilePath_list.append((state_code, school_server_code, eachfile_path))
-    return FilePath_list
+                                if (low_bound <= date_copied_ft < up_bound):
+                                    FilePath_list.append((state_code, school_server_code, eachfile_path, eachfile))
+    list_grouped = [(each[3], each) for each in FilePath_list]
+    final_list = [next(v) for k, v in itertools.groupby(sorted(list_grouped, key=lambda x: x[0]), key = lambda x: x[0])]
+    return [(v[0], v[1], v[2]) for k, v in final_list]
 
 def filter_out_latest(list_of_file_paths):
 

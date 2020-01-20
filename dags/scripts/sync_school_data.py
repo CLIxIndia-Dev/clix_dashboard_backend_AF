@@ -12,7 +12,7 @@ from datetime import datetime
 
 from airflow.models import Variable
 import json
-import re 
+import re
 
 def append_school_list(school_update_info, list_of_schools_updated, state):
     re_obj = re.compile( '.*' + re.escape('syncInfo') + '*.')

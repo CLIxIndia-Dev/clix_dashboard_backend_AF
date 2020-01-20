@@ -12,6 +12,7 @@ remote_user = 'parthae'
 remote_ip = '103.36.84.138'
 remote_passwd = 'uvceece2015'
 states = ['mz', 'cg', 'ts', 'rj']
+#states = ['ts']
 static_visuals_states = ['mz', 'ts', 'cg', 'rj']
 num_school_chunks = 4
 

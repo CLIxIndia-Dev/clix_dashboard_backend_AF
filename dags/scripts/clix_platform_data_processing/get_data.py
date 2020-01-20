@@ -53,16 +53,43 @@ def get_modules_data(schools_list, date_range, state):
 def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
 
         '''
-        #Here we are trying to find users who have tools logs but no progress csv logs
-        #But whenever there is tool log, progress csv has to be generated due to the server being
-        # on when the tool was being used. SO we just add them up to the total number of days
-        tools_only_users = set(school_tool_data['user_id'].tolist()) - set(school_dframe['user_id'].tolist())
-        if not (bool(tools_only_users)):
-            num_school_tool_only_logs = 0
-        else:
-            num_school_tool_only_logs = len(school_tool_data[school_tool_data['user_id'].isin(tools_only_users)]['date_created'].unique())
-        '''
+        Following are some of the points to note:
+         - We are trying to estimate number of days only tools are done, only modules are done and modules-tools done together
+         - we know timestamp of module usage upto the nearest days
+         - we know exact timestamp of tool usage
+         - Key idea we want to use - If a student does a module and the related tool within 7 days(earlier or later), we want to consider
+           that the student has done those tools and modules together
+         - To use this idea, we need to combine a student's logs of modules and tools in some way
+         - As we know more precisely about tool log timestamps, we iterate through each tool log of a student and then check if there
+           is any related module entry for that specific user
+         - This way we may be completely ignoring logs of students who have only tool logs and no module logs(the way we
+           iterate through for-loop). So we get these users seperately as 'tool_only_users'
+         - For a given school, we fetch tools data, modules data and server_log_dates
+         - Objective is to identify days on which tools were done along with modules, i.e are done 'together' by a student
+         - 'together' is defined as plus/minus one day difference between tool log and module log of a student
+         - Also, for a given student, we check only those tools which correspond to a given module example: 'astroamer_element_hunt_activity' tool
+           is in ["[u'Basic Astronomy']" module
+         - Following are the steps followed:
+            1. For a school, identify users who did only tools (no module usage). 'adtnl_days' is calculated,
+               these are dates on which tool log is present but module log is not present.
+            2. For each user in modules data, we do the following
+                a. identify user's tool logs
+                b. For each of these tool logs:
+                  a. identify the module corresponding to the tool log
+                  b. see if user has any log for identified module in module_data of user
+                     -  if there is a log, whether it is within 1 day plus/minus to the tool log
+                     -  if there is any such module log, it is considered to be done along with the tool log of the user
+                  c. this is counted as 'modules_n_tools'
+                c. similarly, 'tools_only' and 'module_only'  logs are calculated
+            3. Then we combine these three sets of logs across all users of a school. To this end we compare all three sets across all the users.
+            4. There are four types of days we want to identify:
+                - days on which all students used tools
+                - days on which all students used modules
+                - days on which some students used only modules, some students used only tools and some used both modules and tools
+                - days on which nothing was used but server was up
 
+        '''
+        # defaultdict to be able to store list for each user
         tools_only = defaultdict(list)
         modules_only = defaultdict(list)
         modules_n_tools = defaultdict(list)
@@ -76,24 +103,24 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
         module_users = set(school_dframe['user_id'].unique())
         tool_only_users = list(tool_users - module_users)
 
-        # server up logs of school
-        # Code to pause if the days on which tools were used but there were no server logs registered
+        # here we are finding logs of tool_only_users. they correspond to days on which module log was not registered at all due to
+        # no module activity or systems were on only for small amount of time during which tool was used (which didnt overlap with module
+        # registering times)
         server_on_dates = set(school_server_logs)
         adtnl_days = 0
         if tool_only_users and not(all([elem == 0 for elem in tool_only_users])):
            adtnl_tool_logs = school_tool_data.loc[school_tool_data['user_id'].isin(tool_only_users)]['createdat_end'].unique()
            adtnl_tool_logs_new = pandas.Series(pandas.to_datetime(adtnl_tool_logs, format="%Y-%m-%d %H:%M:%S")).apply(lambda x: str(x.date()))
            # Issue with comparing string with datetime object resulted in error in finding the difference of sets
+           # and that is resolved
            adtnl_days = len(set(adtnl_tool_logs_new) - set([str(each) for each in server_on_dates]))
-           if not(adtnl_days == 0 or adtnl_days == 1):
-               pass
-      
+
         for each_user in school_dframe['user_id'].unique():
             '''
             This code tries to find the non-overlapping access of tools and modules section of the platform
             using tools and course modules date.
             Objective: for a given user, find the module only logs, module and tools logs (these are tool logs, which
-            were generated while using module and tool only logs)  and finally server up with no activity.
+            were generated while using modules), tool only logs and server up with no activity.
 
             '''
             df = school_dframe[school_dframe['user_id'] == each_user]
@@ -117,35 +144,49 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
                 modul_tool_capture = list()
                 # Tool activity was there for this user
                 for each_row in tool_logs.iterrows():
+
                     #If we consider only those modules which correspond to a tool based on the
                     # mapping tool_mod_map
                     tool_module = tool_mod_map[each_row[1]['tool_name']]
+
                     # Here we are using all modules, without considering only those
                     # modules which are mapped to a particular tool as in tool_mod_map
                     #tool_module = all_modules
+
                     each_tool_ts = each_row[1]['createdat_end']
 
-                    # Get all the module activities after the tool log happened
-                    # which correspond to the same module as tool
+                    # Get all the module activities corresponding to this tool log
                     module_dates_df = df[df['module_name'].isin(tool_module)]
 
                     if not(module_dates_df.empty):
                         module_dates_tools = module_dates_df['timestamp']
-                        user_modul_activity = [each for each in module_dates_tools if each_tool_ts <= each]
+
+                        # we look at tool logs which happened in the interval of a week before or later
+                        # than the module log
+                        def both_in_a_week(module_date, tool_date):
+                            return abs((module_date - tool_date).days) <= 2
+                        user_modul_activity = [each for each in module_dates_tools if both_in_a_week(each, each_tool_ts)]
+
                     else:
+
                         user_modul_activity = []
 
                     if not user_modul_activity:
-                        # If there is no module activity for user after tool log, then tool and
+
+                        # If there is no module activity for user after(within a week) tool log, then tool and
                         # module activity together didnt happen
                         tools_only[user].append(each_tool_ts)
+
                     else:
+
                         # If there was module activity after tool log, we assume that tool activity happened
-                        # through module. And also only if both correspond to the same module.
-                        mod_activ_capture = min(user_modul_activity)
-                        modules_n_tools[user].append(mod_activ_capture)
+                        # through module. remember we are using module logs corresponding to tool under consideration
+                        mod_activ_capture = user_modul_activity
+                        modules_n_tools[user].extend(mod_activ_capture)
+
                         #Picking module logs which are overlapping with tools
-                        modul_tool_capture.append(mod_activ_capture)
+                        # this is used to remove them from module_only logs
+                        modul_tool_capture.extend(mod_activ_capture)
 
             if modul_tool_capture:
                 modul_only_dates = [each for each in module_dates if not(pandas.Series([each]).isin(modul_tool_capture)[0])]
@@ -156,10 +197,9 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
                 for each in modul_only_dates:
                     modules_only[user].append(each)
 
-
+        # Now we combine three sets of logs for each student to arrive at three sets for the school
         logs_tools_only = set([log.date() for tool_logs in tools_only.values() for log in tool_logs if log])
 
-        #num_tool_only = len(logs_tools_only)
         try:
             logs_module_only = set([log.date() for mod_logs in modules_only.values() for log in mod_logs if log])
         except Exception as e:
@@ -168,15 +208,27 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
             pdb.set_trace()
 
         logs_modul_tools = set([log.date() for tool_logs in modules_n_tools.values() for log in tool_logs if log])
-        # As the module only log of one user may be the modul-tool log of another user, we are removing mod-tool logs
+
+        # to identify logs on which some students did tools only and others did modules Only
+        logs_tool_only_module_only = logs_tools_only.intersection(logs_module_only)
+
+        # As the module only log date of one user may be the modul-tool log date of another user, we are removing mod-tool logs
         # from modul-only logs at school level, while counting the number.
-        num_of_common_logs = len(logs_module_only.intersection(logs_modul_tools))
-        num_module_only = len(logs_module_only) - num_of_common_logs
+        logs_module_common = logs_module_only.intersection(logs_modul_tools)
 
-        num_of_common_tool_logs = len(logs_tools_only.intersection(logs_modul_tools))
-        num_tool_only = len(logs_tools_only) - num_of_common_tool_logs
+        # considering module only as those days in which all students did only modules
+        num_module_only = len((logs_module_only - logs_module_common) - logs_tool_only_module_only)
 
-        num_tool_modul_logs = len(logs_modul_tools)
+        # As the tool only log date of one user may be the modul-tool log date of another user, we are removing mod-tool logs
+        # from tool-only logs at school level, while counting the number.
+        logs_tool_common = logs_tools_only.intersection(logs_modul_tools)
+
+        # considering tool only as those days in which all students did only tools
+        num_tool_only = len((logs_tools_only - logs_tool_common) - logs_tool_only_module_only)
+
+        # we consider days on which all users did both modules and tools or some users did modules only and others
+        # did tools only --- as modules and tools together days.
+        num_tool_modul_logs = len(logs_modul_tools.union(logs_tool_only_module_only))
 
         '''
         This was an experiment to

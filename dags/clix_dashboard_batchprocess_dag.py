@@ -18,7 +18,7 @@ import config.clix_config as clix_config
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2019, 11, 25, 22),
+    'start_date': datetime(2020, 1, 18, 22),
     #'email': ['airflow@example.com'],
     'email_on_failure': False,
     'email_on_retry': False,
@@ -72,7 +72,7 @@ for each_state in clix_config.states:
             each_state_new = 'ct'
         else:
             each_state_new = each_state
-        
+
         load_state_tables = PythonOperator(
         task_id='load_state_tables_' + str(each) + '_' + each_state_new,
         python_callable=load_school_tables.process_school_tables,
