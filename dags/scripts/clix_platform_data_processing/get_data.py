@@ -169,7 +169,7 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
                         # we look at tool logs which happened in the interval of a week before or later
                         # than the module log
                         def both_in_a_week(module_date, tool_date):
-                            return abs((module_date - tool_date).days) <= 2
+                            return abs((module_date - tool_date).days) <= 1
                         user_modul_activity = [each for each in module_dates_tools if both_in_a_week(each, each_tool_ts)]
 
                     else:
@@ -233,13 +233,15 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
         num_tool_modul_logs = len(logs_modul_tools.union(logs_tool_only_module_only))
 
         # Accounting for additional logs when users only appear in tool logs but not in module logs
-        adtnl_tool_day_logs =  {datetime.strptime(each, '%Y-%m-%d') for each in logs_adtnl_days}
+        adtnl_tool_day_logs =  {datetime.strptime(each, '%Y-%m-%d').date() for each in logs_adtnl_days}
         total_server_up_days = len(server_on_dates.union(adtnl_tool_day_logs))
 
         # considering tool only as those days in which all students did only tools
         # we are adding tool logs of users who didnt appear in the module logs
         num_tool_only = len(((logs_tools_only - logs_tool_common) - logs_tool_only_module_only).union(adtnl_tool_day_logs))
-
+        
+        import pdb 
+        pdb.set_trace()
         '''
         This was an experiment to
         find if there were any tool activities and no server logs generated.
