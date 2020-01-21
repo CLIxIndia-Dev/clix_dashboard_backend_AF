@@ -18,7 +18,7 @@ import config.clix_config as clix_config
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2020, 1, 18, 22),
+    'start_date': datetime(2020, 1, 19, 22),
     #'email': ['airflow@example.com'],
     'email_on_failure': False,
     'email_on_retry': False,

@@ -240,8 +240,6 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
         # we are adding tool logs of users who didnt appear in the module logs
         num_tool_only = len(((logs_tools_only - logs_tool_common) - logs_tool_only_module_only).union(adtnl_tool_day_logs))
         
-        import pdb 
-        pdb.set_trace()
         '''
         This was an experiment to
         find if there were any tool activities and no server logs generated.
