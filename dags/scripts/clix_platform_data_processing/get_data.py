@@ -109,6 +109,7 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
         # registering times)
         server_on_dates = set(school_server_logs)
         adtnl_days = 0
+        logs_adtnl_days = set()
         if tool_only_users and not(all([elem == 0 for elem in tool_only_users])):
            adtnl_tool_logs = school_tool_data.loc[school_tool_data['user_id'].isin(tool_only_users)]['createdat_end'].unique()
            adtnl_tool_logs_new = pandas.Series(pandas.to_datetime(adtnl_tool_logs, format="%Y-%m-%d %H:%M:%S")).apply(lambda x: str(x.date()))
