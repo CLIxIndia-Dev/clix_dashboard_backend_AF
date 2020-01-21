@@ -15,6 +15,7 @@ import json
 import itertools
 import operator
 import pandas
+from datetime import datetime
 
 syncthing_live_data_path = clix_config.local_dst
 
@@ -113,7 +114,11 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
            adtnl_tool_logs_new = pandas.Series(pandas.to_datetime(adtnl_tool_logs, format="%Y-%m-%d %H:%M:%S")).apply(lambda x: str(x.date()))
            # Issue with comparing string with datetime object resulted in error in finding the difference of sets
            # and that is resolved
-           adtnl_days = len(set(adtnl_tool_logs_new) - set([str(each) for each in server_on_dates]))
+           # there was also a glitch in accounting for logs of students who appear only in tools data.
+           # earlier we ignored the possibility that logs of these students may be overlapping with logs of other students who have
+           # both tools data and modules data. This could be because of some internal error, where only module logs of some students is
+           # left out
+           logs_adtnl_days = set(adtnl_tool_logs_new) - set([str(each) for each in server_on_dates])
 
         for each_user in school_dframe['user_id'].unique():
             '''
@@ -223,12 +228,17 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
         # from tool-only logs at school level, while counting the number.
         logs_tool_common = logs_tools_only.intersection(logs_modul_tools)
 
-        # considering tool only as those days in which all students did only tools
-        num_tool_only = len((logs_tools_only - logs_tool_common) - logs_tool_only_module_only)
-
         # we consider days on which all users did both modules and tools or some users did modules only and others
         # did tools only --- as modules and tools together days.
         num_tool_modul_logs = len(logs_modul_tools.union(logs_tool_only_module_only))
+
+        # Accounting for additional logs when users only appear in tool logs but not in module logs
+        adtnl_tool_day_logs =  {datetime.strptime(each, '%Y-%m-%d') for each in logs_adtnl_days}
+        total_server_up_days = len(server_on_dates.union(adtnl_tool_day_logs))
+
+        # considering tool only as those days in which all students did only tools
+        # we are adding tool logs of users who didnt appear in the module logs
+        num_tool_only = len(((logs_tools_only - logs_tool_common) - logs_tool_only_module_only).union(adtnl_tool_day_logs))
 
         '''
         This was an experiment to
@@ -259,11 +269,11 @@ def get_lab_usage(school_dframe, school_tool_data, school_server_logs):
 
         #print('Super Tool only activity is {}', tools_only_users)
         '''
-        days_server_wo_activity = (len(server_on_dates) + adtnl_days) - num_tool_modul_logs - num_module_only - (num_tool_only + adtnl_days)
+        days_server_wo_activity = (total_server_up_days - num_tool_modul_logs - num_module_only - num_tool_only)
 
         school_dframe['days_server_wo_activity'] = days_server_wo_activity
-        school_dframe['tools_only_activity'] = num_tool_only + adtnl_days
+        school_dframe['tools_only_activity'] = num_tool_only
         school_dframe['module_only_activity'] = num_module_only
         school_dframe['tool_with_module_activity'] = num_tool_modul_logs
-        school_dframe['total_days_server_on'] = len(server_on_dates) + adtnl_days
+        school_dframe['total_days_server_on'] = total_server_up_days
         return school_dframe
