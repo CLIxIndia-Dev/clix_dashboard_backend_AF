@@ -8,9 +8,9 @@ local_dst = '/usr/local/airflow/school_syncthing_data_live/'
 local_dst_static_vis = '/usr/local/airflow/syncthing_data_static_vis/'
 local_dst_state_data_logs = '/usr/local/airflow/state_level_data_logs/'
 
-remote_user = 'parthae'
-remote_ip = '103.36.84.138'
-remote_passwd = 'uvceece2015'
+remote_user = '<Host username>'
+remote_ip = '<server IP>'
+remote_passwd = '<server password>'
 states = ['mz', 'cg', 'ts', 'rj']
 #states = ['ts']
 static_visuals_states = ['mz', 'ts', 'cg', 'rj']
@@ -18,8 +18,8 @@ num_school_chunks = 4
 
 DB_TYPE = 'postgresql'
 DB_DRIVER = 'psycopg2'
-DB_USER = 'admin_clixdata'
-DB_PASS = 'clixdata'
+DB_USER = '<db admin username>'
+DB_PASS = '<db admin password>'
 DB_HOST = '172.17.0.1'
 DB_PORT = '5433'
 DB_NAME = 'clix_dashboard_db'
