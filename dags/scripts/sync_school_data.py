@@ -35,6 +35,7 @@ def schools_updated(rsync_log):
     schools = set([each[0] for each in pattern.findall(log_text) if each[1] == 'gstudio'])
     return list(schools)
 
+
 def rsync_data_local(state, src, dst, **context):
     '''
     Function to sync state data from local hdd.
@@ -69,6 +70,7 @@ def rsync_data_local(state, src, dst, **context):
 
     return local_sync(src, dst)
 
+
 def rsync_data_ssh(state, src, dst, static_flag, **context):
     '''
     Function to sync state data through ssh.
@@ -81,29 +83,42 @@ def rsync_data_ssh(state, src, dst, static_flag, **context):
     def ssh_sync(src, dst):
         cmd = "rsync -avzhP --stats {0}@{1}:{2} {3}".format(user, ip, src, dst)
         #cmd = "rsync -avzhP --stats {0} {1}".format(src, dst)
-        rsync = pexpect.spawn(cmd, timeout=3600)
+        # TODO: Need to explicitly catch error from pexpect when there is
+        # timeout or eof error. try and except is ot working.
+        # For now setup a very high timeout to not get these
+        # errors
+
+        rsync = pexpect.spawn(cmd, timeout=7200)
+
         try:
-            i = rsync.expect(["{0}@{1}'s password: ".format(user, ip), 'continue connecting (yes/no)?', 'Are you sure you want to'])
+            i = rsync.expect(["{0}@{1}'s password: ".format(user, ip),
+            'continue connecting (yes/no)?',
+            'Are you sure you want to'])
+
             if i == 0 :
                 rsync.sendline(passwd)
+
             elif (i == 1) or (i == 2):
                 rsync.sendline('yes')
                 i = rsync.expect("{0}@{1}'s password: ".format(user, ip))
                 rsync.sendline(passwd)
-        except pexpect.EOF:
-            print("EOF Exception for Syncing")
-            raise Exception('Rysnc didnt work!')
+            else:
+                import pdb
+                pdb.set_trace()
+                raise Exception('Something wrong with authentication!')
 
-        except pexpect.TIMEOUT:
-            print("TIMEOUT Exception Syncing")
-            raise Exception('Not enough time given to Rsync!')
+        except pexpect.TIMEOUT as e:
+            pass
 
-        else:
-          rsync_log = rsync.read()
-          list_of_schools_updated = schools_updated(rsync_log)
-          context['ti'].xcom_push(key='school_update_list', value=list_of_schools_updated)
-          # Change tracking variables only if there is any school synced
-          if len(list_of_schools_updated) != 0:
+        except pexpect.EOF as e:
+            pass
+
+        finally:
+            rsync_log = rsync.read()
+            list_of_schools_updated = schools_updated(rsync_log)
+            context['ti'].xcom_push(key='school_update_list', value=list_of_schools_updated)
+            # Change tracking variables only if there is any school synced
+            if len(list_of_schools_updated) != 0:
              if static_flag:
                school_update_info = Variable.get('clix_variables_config_static_vis', deserialize_json=True)
                Variable.set('clix_variables_config_static_vis', append_school_list(school_update_info, list_of_schools_updated, state))
@@ -111,9 +126,5 @@ def rsync_data_ssh(state, src, dst, static_flag, **context):
                school_update_info = Variable.get('clix_variables_config_schooldb', deserialize_json=True)
                Variable.set('clix_variables_config_schooldb', append_school_list(school_update_info, list_of_schools_updated, state))
 
-          #if list_of_schools_updated:
-          #     Variable.set('prev_update_date', Variable.get('curr_update_date'))
-          #     Variable.set('curr_update_date', datetime.utcnow())
-          rsync.close()
-
+            rsync.close()
     return ssh_sync(src, dst)

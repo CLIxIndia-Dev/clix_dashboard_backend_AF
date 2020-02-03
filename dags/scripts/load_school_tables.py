@@ -39,12 +39,11 @@ def process_school_tables(state, chunk, **context):
         state_new = state
 
     list_of_schools = context['ti'].xcom_pull(task_ids='sync_state_data_' + state_new, key = 'school_update_list')
-    #list_of_schools = ['2051007-mz94']
+    #list_of_schools = ['2051007-mz94', '2031010-mz10']
+
     # To check is there is any school which is synced for the first time
     list_of_old_schools = Variable.get('clix_variables_config_schooldb', deserialize_json=True)[state_new]["schools_synced_so_far"]
-
     list_of_schools_new = list(set(list_of_schools) - set(list_of_old_schools))
-
     if len(list_of_schools_new) != 0:
         schools_to_process_new = partition(list_of_schools_new)[chunk]
     else:
@@ -52,23 +51,27 @@ def process_school_tables(state, chunk, **context):
 
     schools_to_process = partition(list_of_schools)[chunk]
 
-    print(schools_to_process)
-    print(schools_to_process_new)
+    print("Old schools updated are - {}".format(schools_to_process))
+    print("New schools updated are - {}".format(schools_to_process_new))
 
     if schools_to_process:
-        #print('Got all schools')
-        prev_update_date = Variable.get('prev_update_date_' + state)
-        curr_update_date = Variable.get('curr_update_date_' + state)
 
+        '''
+        tried to do marginal processing of updated data, but didnt work
+        #prev_update_date = Variable.get('prev_update_date_' + state)
+        #curr_update_date = Variable.get('curr_update_date_' + state)
+
+        #this approach didnt work
         # to account for descripency while syncthing. we always do for a window slided by one day backwards
         # this helps in considering any partial syncthing happening on a given day
         #prev_update_date_new = datetime.strftime(datetime.strptime(prev_update_date, '%Y-%m-%d') + timedelta(days=-1), '%Y-%m-%d')
         #curr_update_date_new = datetime.strftime(datetime.strptime(curr_update_date, '%Y-%m-%d') + timedelta(days=-1), '%Y-%m-%d')
 
-        date_range = [prev_update_date, curr_update_date]
-
+        #date_range = [prev_update_date, curr_update_date]
+        '''
+        # Just process for the entire period, whenever a school is updated
         #date_range = ['2018-06-01', Variable.get('curr_update_date_' + state)]
-        #date_range = ['2018-06-01', str(datetime.utcnow().date())]
+        date_range = ['2018-06-01', str(datetime.utcnow().date())]
         schools_data = metrics_data(schools=schools_to_process, state=state, date_range=date_range)
 
         metric1_attendance = schools_data.get_num_stud_daily()
@@ -102,28 +105,12 @@ def process_school_tables(state, chunk, **context):
           pdb.set_trace()
         other_tasks_status = all([each.current_state() == 'success' for each in ti_list])
         if other_tasks_status:
-            Variable.set('prev_update_date_' + state, Variable.get('curr_update_date_' + state))
-            Variable.set('curr_update_date_' + state, datetime.utcnow().date())
-        #metric2_modulevisits = get_modulevisits(schools_to_process, state, date_range)
-        #status2 = load_into_db(metric2_modulevisits)
-
-        #metric3_timespent = get_timespent(schools_to_process, state, date_range)
-        #status3= load_into_db(metric3_timespent)
-
-        #modules_data = get_modules_data(schools_to_process)
-        # To get school attendance data. Time variation of number of unique logins
-        # from modules and tools data
-        #attendance_table = get_attendance_schools(schools_to_process, tools_data, modules_data)
-        # To get number of modules visited broken down by subject/domain over time.
-        #module_visits_table = get_modulevisits_schools(schools_to_process, modules_data)
-        # To get time spent on different tools in school over time.
-        #timespent_tools_table = get_timespent_schools(schools_to_process, tools_data)
-        #time.sleep(10)
-
+            Variable.set('last_updated_date_' + state, datetime.utcnow().date())
     else:
         print('No schools to process for this task')
 
     '''
+    This was to accomodate for newly synced schools when processing data incrementally
     if schools_to_process_new:
         #print('Got all schools')
         date_range = ['2018-07-01', Variable.get('curr_update_date_' + state)]
