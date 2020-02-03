@@ -75,36 +75,19 @@
 			"Jul2019", "Aug2019", "Sep2019", "Oct2019", "Dec2019", "Jan2020"]
 	},
 
-  "prev_update_date_mz": "2018-06-01",
+  "last_updated_date_mz": "2018-06-01",
 
-  "prev_update_date_ct": "2018-06-01",
+  "last_updated_date_ct": "2018-06-01",
 
-  "prev_update_date_tg": "2018-06-01",
+  "last_updated_date_tg": "2018-06-01",
 
-  "prev_update_date_rj": "2018-06-01",
+  "last_updated_date_rj": "2018-06-01",
 
-	"curr_update_date_mz": "2020-01-26",
+	"last_updated_date_static_mz": "2018-06-01",
 
-  "curr_update_date_ct": "2020-01-26",
+  "last_updated_date_static_ct": "2018-06-01",
 
-  "curr_update_date_tg": "2020-01-26",
+  "last_updated_date_static_tg": "2018-06-01",
 
-  "curr_update_date_rj": "2020-01-26",
-
-	"prev_update_date_static_mz": "2018-06-01",
-
-  "prev_update_date_static_ct": "2018-06-01",
-
-  "prev_update_date_static_tg": "2018-06-01",
-
-  "prev_update_date_static_rj": "2018-06-01",
-
-	"curr_update_date_static_mz": "2020-01-26",
-
-  "curr_update_date_static_ct": "2020-01-26",
-
-  "curr_update_date_static_tg": "2020-01-26",
-
-  "curr_update_date_static_rj": "2020-01-26"
-
+  "last_updated_date_static_rj": "2018-06-01"
 }
