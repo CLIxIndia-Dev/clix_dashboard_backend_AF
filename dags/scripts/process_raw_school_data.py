@@ -14,6 +14,10 @@ import pandas
 import json
 from functools import reduce
 
+from airflow.models import Variable
+from airflow.models import TaskInstance
+from airflow.models import DagBag
+
 tools_modules_server_logs_datapath = clix_config.local_dst_state_data_logs
 
 def load_to_db(metric_data):
