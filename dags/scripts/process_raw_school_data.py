@@ -45,7 +45,9 @@ def process_school_data(state, chunk, **context):
         #print('Got all schools')
         #This date range is just to process latest data logs and then append them to already processed logs data
         # for each state
-        date_range = [Variable.get('prev_update_date_static_' + state), Variable.get('curr_update_date_static_' + state)]
+
+        date_range = ['2018-06-01', str(datetime.utcnow().date())]
+        #date_range = [Variable.get('prev_update_date_static_' + state), Variable.get('curr_update_date_static_' + state)]
         schools_log_data = get_log_level_data(schools=schools_to_process, state=state, date_range=date_range)
 
         # Save chunk of tools data of a state
@@ -63,9 +65,20 @@ def process_school_data(state, chunk, **context):
           json.dump(server_logs_data, f, ensure_ascii=True, indent=4)
         f.close()
 
-        if chunk >= clix_config.num_school_chunks - 1:
-            Variable.set('prev_update_date_static_' + state, Variable.get('curr_update_date_static_' + state))
-            Variable.set('curr_update_date_static_' + state, datetime.utcnow().date())
+        all_chunks = [*range(clix_config.num_school_chunks)]
+        all_chunks.remove(chunk)
+        try:
+          dag_bag = DagBag('/usr/local/airflow/dags/clix_static_visuals_dag.py')
+          target_dag = dag_bag.get_dag('clix_static_visuals_dag')
+          dr = target_dag.get_dagrun(target_dag.latest_execution_date)
+          ti_list = [dr.get_task_instance('process_raw_state_data_' + str(each) + '_' + state) for each in all_chunks]
+        except Exception as e:
+          import pdb
+          pdb.set_trace()
+        other_tasks_status = all([each.current_state() == 'success' for each in ti_list])
+        if other_tasks_status:
+            Variable.set('last_updated_date_static_' + state, datetime.utcnow().date())
+
     else:
 
         print('No schools to process for this task')
@@ -107,7 +120,7 @@ def combine_chunks(state, **context):
     return None
 
 def get_state_static_vis_data(state, all_states_flag, **context):
-
+    
     months_list = Variable.get('static_vis_range', deserialize_json=True)['months_list']
 
     # Get all the data files required for vis data generation
@@ -150,7 +163,7 @@ def get_state_static_vis_data(state, all_states_flag, **context):
             state_vis_data_path = tools_modules_server_logs_datapath + 'vis_data/' + 'all_states_' + each_month
         else:
             import pdb
-            pdb.set_trace()        
+            pdb.set_trace()
 
         if not state_tools_data_new.empty:
             state_tools_data_new = state_tools_data_new.groupby(["school_server_code"]).apply(lambda x: get_engagement_metrics(x,
