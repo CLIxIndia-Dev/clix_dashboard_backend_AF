@@ -217,7 +217,7 @@ def get_schools_module_data(parent_directory, schools_list, date_range, state):
 #schools_list = ['2031011-mz11', '2031020-mz20', '2031022-mz22']
 
  csv_files = get_file_paths(parent_directory, schools_list, regex_file, regex_dir, date_range)
-
+ 
  if not csv_files:
      print('No files for the given school list are found: {}'.format(schools_list))
      return (pandas.DataFrame(), defaultdict(list))

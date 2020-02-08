@@ -280,15 +280,20 @@ def fetch_log_level_data_tools(data_path, schools, state):
 
     # Tools related json files - indexed by state and school ids
     tools_json_files = get_files(parent_directory, schools)
+    # To account for duplication in folders of syncthing data i.e., for 2018, 2019 and 2020
+    # We filter out unique files from a given school 
+    list_grouped = [('/'.join(each[1][1].split('/')[-5:]), each) for each in tools_json_files]
+    unique_file_iterator = map(next, map(operator.itemgetter(1), itertools.groupby(sorted(list_grouped, key=lambda x: x[0]), key = lambda x: x[0])))
+    tools_json_files_unique = [each[1] for each in unique_file_iterator]
 
-    if not tools_json_files:
+    if not tools_json_files_unique:
         print('No Tools data for the school list:{}'.format(schools))
         return pandas.DataFrame()
 
     print('Done fetching all the relevant json files indexed by state_code and school_server_id')
     print('------------------------------------------------------------------------------------')
     # Extracted data from tools json files - for all states and schools
-    tools_all_schools_data = accumulator(tools_json_files)
+    tools_all_schools_data = accumulator(tools_json_files_unique)
     print('Done with extracting relevant information from all the json files.\n')
 
     return pandas.DataFrame(tools_all_schools_data[state])
