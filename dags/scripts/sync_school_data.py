@@ -31,8 +31,10 @@ def append_school_list(school_update_info, list_of_schools_updated, state):
 
 def schools_updated(rsync_log):
     log_text = rsync_log.decode('utf-8')
-    pattern = re.compile(r"(\d+-\D{2}\d+)\/(gstudio)")
-    schools = set([each[0] for each in pattern.findall(log_text) if each[1] == 'gstudio'])
+    pattern = r"(\d+-\D{2}\d+)\/(gstudio)"
+    pattern2 = r"(-\D{2}\d+)\/(gstudio)"
+    pattern3 = r"(\w+-\D{2}\d+)\/(gstudio)"
+    schools = set([each[each.index('gstudio') - 1] for each in re.findall("|".join([pattern,pattern2,pattern3]), log_text) if each.index('gstudio')])
     return list(schools)
 
 
